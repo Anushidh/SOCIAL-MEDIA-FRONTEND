@@ -1,0 +1,9 @@
+@if (url) {
+  <img [src]="url" [alt]="safeName" [class]="sizeClass + ' rounded-full object-cover flex-shrink-0'">
+} @else {
+  <div [class]="sizeClass + ' rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0'">
+    <span [class]="textClass + ' font-bold text-primary-600 uppercase'">
+      {{ safeName[0] || '?' }}
+    </span>
+  </div>
+}

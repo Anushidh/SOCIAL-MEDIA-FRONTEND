@@ -1,0 +1,103 @@
+
+    <div class="bg-white rounded-xl border border-gray-100 p-4 hover:border-gray-200 transition-colors">
+      <!-- Author -->
+      <div class="flex items-center justify-between mb-3">
+        <a [routerLink]="['/profile', post.author?.username]" class="flex items-center gap-2.5 group">
+          <app-avatar [url]="post.author?.avatarUrl" [name]="post.author?.displayName" size="sm"/>
+          <div>
+            <p class="font-semibold text-gray-900 text-sm group-hover:text-primary-600 transition-colors">
+              {{ post.author?.displayName }}
+            </p>
+            <p class="text-xs text-gray-400">&#64;{{ post.author?.username }}</p>
+          </div>
+        </a>
+        <span class="text-xs text-gray-400">{{ post.createdAt | timeAgo }}</span>
+      </div>
+
+      <!-- Content -->
+      <a [routerLink]="['/post', post.id]">
+        <p class="text-gray-800 text-sm leading-relaxed mb-3 whitespace-pre-wrap">{{ post.content }}</p>
+      </a>
+
+      <!-- Images -->
+      @if (post.imageUrls?.length) {
+        <div class="mb-3 rounded-lg overflow-hidden"
+             [ngClass]="(post.imageUrls?.length ?? 0) === 1 ? '' : 'grid grid-cols-2 gap-1'">
+          @for (img of (post.imageUrls ?? []).slice(0, 4); track img; let i = $index) {
+            <div class="relative" [class.col-span-2]="(post.imageUrls?.length ?? 0) === 1">
+              <img [src]="img" alt="Post image"
+                   class="w-full object-cover rounded-lg"
+                   [class.max-h-80]="(post.imageUrls?.length ?? 0) === 1"
+                   [class.h-44]="(post.imageUrls?.length ?? 0) > 1">
+              @if (i === 3 && (post.imageUrls?.length ?? 0) > 4) {
+                <div class="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                  <span class="text-white font-bold text-xl">+{{ (post.imageUrls?.length ?? 0) - 4 }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Hashtags -->
+      @if (post.hashtags?.length) {
+        <div class="flex flex-wrap gap-1 mb-3">
+          @for (tag of post.hashtags; track tag.id) {
+            <a [routerLink]="['/hashtag', tag.name]"
+               class="text-xs text-primary-600 hover:text-primary-700 font-medium">
+              #{{ tag.name }}
+            </a>
+          }
+        </div>
+      }
+
+      <!-- Actions -->
+      <div class="flex items-center gap-5 pt-2 border-t border-gray-50">
+        <!-- Like -->
+        <button (click)="onLike()" class="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors group">
+          <svg class="w-5 h-5" [class.fill-red-500]="post.isLiked" [class.text-red-500]="post.isLiked"
+               [attr.fill]="post.isLiked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+          <span class="text-xs font-medium" [class.text-red-500]="post.isLiked">{{ post.likesCount }}</span>
+        </button>
+
+        <!-- Comment -->
+        <a [routerLink]="['/post', post.id]" class="flex items-center gap-1.5 text-gray-400 hover:text-primary-500 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          <span class="text-xs font-medium">{{ post.commentsCount }}</span>
+        </a>
+
+        <!-- Repost -->
+        <button (click)="onRepost()" class="flex items-center gap-1.5 text-gray-400 hover:text-green-500 transition-colors"
+                [class.text-green-500]="post.isReposted">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          <span class="text-xs font-medium">{{ post.repostsCount }}</span>
+        </button>
+
+        <!-- Bookmark -->
+        <button (click)="onBookmark()" class="ml-auto flex items-center text-gray-400 hover:text-primary-500 transition-colors"
+                [class.text-primary-500]="post.isBookmarked">
+          <svg class="w-5 h-5" [attr.fill]="post.isBookmarked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+          </svg>
+        </button>
+
+        <!-- Report -->
+        <button (click)="onReport()" class="flex items-center text-gray-300 hover:text-red-400 transition-colors ml-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  

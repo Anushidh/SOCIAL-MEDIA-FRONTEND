@@ -1,0 +1,57 @@
+
+    <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+      <h1 class="text-xl font-bold text-gray-900 mb-5">Saved Posts</h1>
+
+      @if (loading && posts.length === 0) {
+        <div class="space-y-4">
+          @for (i of [1,2,3]; track i) {
+            <div class="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+                <div class="flex-1"><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+              </div>
+              <div class="h-3 bg-gray-200 rounded w-full mb-1.5"></div>
+              <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!loading && posts.length === 0) {
+        <div class="text-center py-16 bg-white rounded-2xl border border-gray-100">
+          <svg class="w-12 h-12 mx-auto text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+          </svg>
+          <p class="text-gray-400 font-medium">No saved posts yet</p>
+          <p class="text-sm text-gray-300 mt-1">Bookmark posts to find them here later</p>
+        </div>
+      }
+
+      <div class="space-y-4">
+        @for (post of posts; track post.id) {
+          <app-post-card [post]="post"
+            (liked)="toggleLike($event)"
+            (bookmarked)="removeBookmark($event)"
+            (reposted)="toggleRepost($event)"
+            (reported)="reportingPost = $event"/>
+        }
+      </div>
+
+      @if (hasMore) {
+        <div class="text-center mt-6">
+          <button (click)="loadMore()" [disabled]="loading"
+                  class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+            Load more
+          </button>
+        </div>
+      }
+
+      @if (reportingPost) {
+        <app-report-modal
+          [entityId]="reportingPost.id"
+          entityType="post"
+          (close)="reportingPost = null"/>
+      }
+    </div>
+  

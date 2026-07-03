@@ -1,0 +1,110 @@
+
+    <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+
+      <!-- Search input -->
+      <div class="relative mb-5">
+        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input [(ngModel)]="query" (ngModelChange)="onSearch($event)" type="text"
+               placeholder="Search people, posts, or #hashtags…"
+               class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
+        @if (query) {
+          <button (click)="clearSearch()"
+                  class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        }
+      </div>
+
+      <!-- Tabs -->
+      @if (query) {
+        <div class="flex bg-white rounded-xl border border-gray-100 mb-4">
+          @for (tab of tabs; track tab.key) {
+            <button (click)="activeTab = tab.key"
+                    class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
+                    [class.bg-primary-600]="activeTab === tab.key"
+                    [class.text-white]="activeTab === tab.key"
+                    [class.text-gray-500]="activeTab !== tab.key">
+              {{ tab.label }}
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Loading -->
+      @if (loading) {
+        <div class="flex justify-center py-8">
+          <div class="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }
+
+      <!-- Users results -->
+      @if (!loading && activeTab === 'users') {
+        @if (users.length > 0) {
+          <div class="space-y-2">
+            @for (user of users; track user.id) {
+              <a [routerLink]="['/profile', user.username]"
+                 class="flex items-center gap-3 bg-white rounded-xl border border-gray-100 p-3.5 hover:border-gray-200 transition-colors">
+                <app-avatar [url]="user.avatarUrl" [name]="user.displayName" size="md"/>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-gray-900 text-sm truncate">{{ user.displayName }}</p>
+                  <p class="text-xs text-gray-400 truncate">&#64;{{ user.username }}</p>
+                  @if (user.bio) {
+                    <p class="text-xs text-gray-500 mt-0.5 truncate">{{ user.bio }}</p>
+                  }
+                </div>
+              </a>
+            }
+          </div>
+        } @else if (query) {
+          <div class="text-center py-12">
+            <p class="text-gray-400 font-medium">No people found for "{{ query }}"</p>
+          </div>
+        }
+      }
+
+      <!-- Posts results -->
+      @if (!loading && activeTab === 'posts') {
+        @if (posts.length > 0) {
+          <div class="space-y-4">
+            @for (post of posts; track post.id) {
+              <app-post-card [post]="post"
+                (liked)="toggleLike($event)"
+                (bookmarked)="toggleBookmark($event)"
+                (reposted)="toggleRepost($event)"
+                (reported)="reportingPost = $event"/>
+            }
+          </div>
+        } @else if (query) {
+          <div class="text-center py-12">
+            <p class="text-gray-400 font-medium">No posts found for "{{ query }}"</p>
+          </div>
+        }
+      }
+
+      <!-- Initial empty state -->
+      @if (!query) {
+        <div class="text-center py-16">
+          <svg class="w-12 h-12 mx-auto text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <p class="text-gray-400 font-medium">Search for people and posts</p>
+          <p class="text-xs text-gray-300 mt-1">Use #hashtag to search by topic</p>
+        </div>
+      }
+
+      <!-- Report modal -->
+      @if (reportingPost) {
+        <app-report-modal
+          [entityId]="reportingPost.id"
+          entityType="post"
+          (close)="reportingPost = null"/>
+      }
+    </div>
+  

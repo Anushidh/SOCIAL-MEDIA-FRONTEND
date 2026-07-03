@@ -1,0 +1,126 @@
+
+    <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+
+      <!-- Create post -->
+      <div class="bg-white rounded-xl border border-gray-100 p-4 mb-4">
+        <div class="flex items-center gap-3">
+          <app-avatar [url]="currentUser?.avatarUrl" [name]="currentUser?.displayName" size="sm"/>
+          <button (click)="showComposer = true"
+                  class="flex-1 text-left px-4 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-400 transition-colors">
+            What's on your mind?
+          </button>
+        </div>
+      </div>
+
+      <!-- Composer Modal -->
+      @if (showComposer) {
+        <div class="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
+          <div class="bg-white rounded-2xl w-full max-w-lg">
+            <div class="flex items-center justify-between p-4 border-b">
+              <h2 class="font-bold text-gray-900">New Post</h2>
+              <button (click)="showComposer = false" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="p-4">
+              <div class="flex gap-3">
+                <app-avatar [url]="currentUser?.avatarUrl" [name]="currentUser?.displayName" size="sm"/>
+                <textarea [(ngModel)]="newPostContent"
+                          placeholder="What's on your mind? Use #hashtags and @mentions"
+                          rows="4"
+                          class="flex-1 resize-none border-0 focus:outline-none text-sm text-gray-800 placeholder-gray-400">
+                </textarea>
+              </div>
+              <div class="flex items-center justify-between mt-3 pt-3 border-t">
+                <span class="text-xs text-gray-400">{{ 2200 - newPostContent.length }} chars left</span>
+                <button (click)="createPost()"
+                        [disabled]="!newPostContent.trim() || posting"
+                        class="px-5 py-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white text-sm font-semibold rounded-full transition-colors">
+                  {{ posting ? 'Posting…' : 'Post' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Tabs -->
+      <div class="flex bg-white rounded-xl border border-gray-100 mb-4">
+        <button (click)="activeTab = 'feed'; loadPosts()"
+                class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
+                [class.bg-primary-600]="activeTab === 'feed'"
+                [class.text-white]="activeTab === 'feed'"
+                [class.text-gray-500]="activeTab !== 'feed'">
+          Feed
+        </button>
+        <button (click)="activeTab = 'explore'; loadPosts()"
+                class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
+                [class.bg-primary-600]="activeTab === 'explore'"
+                [class.text-white]="activeTab === 'explore'"
+                [class.text-gray-500]="activeTab !== 'explore'">
+          Explore
+        </button>
+      </div>
+
+      <!-- Posts -->
+      @if (loading && posts.length === 0) {
+        <div class="space-y-4">
+          @for (i of [1,2,3]; track i) {
+            <div class="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+                <div class="flex-1">
+                  <div class="h-3 bg-gray-200 rounded w-24 mb-1"></div>
+                  <div class="h-2 bg-gray-100 rounded w-16"></div>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="h-3 bg-gray-200 rounded w-full"></div>
+                <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!loading && posts.length === 0) {
+        <div class="text-center py-16">
+          <p class="text-gray-400 font-medium">No posts yet</p>
+          <p class="text-sm text-gray-300 mt-1">
+            {{ activeTab === 'feed' ? 'Follow users to see their posts' : 'Be the first to post' }}
+          </p>
+        </div>
+      }
+
+      <div class="space-y-4">
+        @for (post of posts; track post.id) {
+          <app-post-card
+            [post]="post"
+            (liked)="toggleLike($event)"
+            (bookmarked)="toggleBookmark($event)"
+            (reposted)="toggleRepost($event)"
+            (reported)="reportingPost = $event"/>
+        }
+      </div>
+
+      <!-- Load more -->
+      @if (hasMore) {
+        <div class="text-center mt-6">
+          <button (click)="loadMore()" [disabled]="loading"
+                  class="px-6 py-2 text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+            {{ loading ? 'Loading…' : 'Load more' }}
+          </button>
+        </div>
+      }
+
+      <!-- Report modal -->
+      @if (reportingPost) {
+        <app-report-modal
+          [entityId]="reportingPost.id"
+          entityType="post"
+          (close)="reportingPost = null"/>
+      }
+    </div>
+  

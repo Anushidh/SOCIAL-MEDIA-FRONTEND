@@ -1,0 +1,115 @@
+
+    <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="text-xl font-bold text-gray-900">Stories</h1>
+        <button (click)="showUpload = true"
+                class="flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-full transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Add Story
+        </button>
+      </div>
+
+      <!-- Upload modal -->
+      @if (showUpload) {
+        <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl w-full max-w-sm p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="font-bold text-gray-900">New Story</h2>
+              <button (click)="showUpload = false" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="space-y-3">
+              <label class="block w-full border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-primary-400 transition-colors">
+                @if (previewUrl) {
+                  <img [src]="previewUrl" class="max-h-40 mx-auto rounded-lg object-cover">
+                } @else {
+                  <svg class="w-8 h-8 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <p class="text-sm text-gray-400">Click to select an image</p>
+                }
+                <input type="file" accept="image/*" class="hidden" (change)="onFileSelect($event)">
+              </label>
+              <input type="text" [(ngModel)]="caption" placeholder="Add a caption…" maxlength="200"
+                     class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <button (click)="uploadStory()" [disabled]="!selectedFile || uploading"
+                      class="w-full py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors">
+                {{ uploading ? 'Posting…' : 'Share Story' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Story viewer modal -->
+      @if (viewingStory) {
+        <div class="fixed inset-0 bg-black z-50 flex items-center justify-center" (click)="closeStory()">
+          <div class="relative max-w-sm w-full h-[80vh]" (click)="$event.stopPropagation()">
+            <img [src]="viewingStory.imageUrl" class="w-full h-full object-cover rounded-2xl">
+            @if (viewingStory.caption) {
+              <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 rounded-b-2xl">
+                <p class="text-white text-sm">{{ viewingStory.caption }}</p>
+              </div>
+            }
+            <button (click)="closeStory()" class="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Stories list -->
+      @if (loading) {
+        <div class="flex gap-4 overflow-x-auto pb-2">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="flex-shrink-0 flex flex-col items-center gap-1.5 animate-pulse">
+              <div class="w-16 h-16 rounded-full bg-gray-200"></div>
+              <div class="h-2 bg-gray-200 rounded w-12"></div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!loading && storyGroups.length === 0) {
+        <div class="text-center py-16">
+          <p class="text-gray-400 font-medium">No stories right now</p>
+          <p class="text-sm text-gray-300 mt-1">Follow people to see their stories</p>
+        </div>
+      }
+
+      <div class="space-y-6">
+        @for (group of storyGroups; track group.user.id) {
+          <div class="bg-white rounded-2xl border border-gray-100 p-4">
+            <div class="flex items-center gap-2.5 mb-3">
+              <app-avatar [url]="group.user.avatarUrl" [name]="group.user.displayName" size="sm"/>
+              <div>
+                <p class="font-semibold text-sm text-gray-900">{{ group.user.displayName }}</p>
+                <p class="text-xs text-gray-400">{{ group.stories.length }} story{{ group.stories.length > 1 ? 'ies' : '' }}</p>
+              </div>
+            </div>
+            <div class="flex gap-2 overflow-x-auto">
+              @for (story of group.stories; track story.id) {
+                <button (click)="viewStory(story)"
+                        class="flex-shrink-0 w-20 h-28 rounded-xl overflow-hidden relative border-2 border-primary-400">
+                  <img [src]="story.imageUrl" class="w-full h-full object-cover">
+                  @if (story.caption) {
+                    <div class="absolute bottom-0 left-0 right-0 p-1 bg-gradient-to-t from-black/60">
+                      <p class="text-white text-[10px] leading-tight truncate">{{ story.caption }}</p>
+                    </div>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  
