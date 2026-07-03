@@ -78,4 +78,8 @@ export class PostsService {
   getPostsByHashtag(name: string, page = 1, limit = 20): Observable<PaginatedResponse<Post>> {
     return this.api.get<PaginatedResponse<Post>>(`/hashtags/${name}/posts?page=${page}&limit=${limit}`);
   }
+
+  searchPosts(query: string, page = 1, limit = 20): Observable<PaginatedResponse<Post>> {
+    return this.api.get<PaginatedResponse<Post>>(`/posts/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
+  }
 }

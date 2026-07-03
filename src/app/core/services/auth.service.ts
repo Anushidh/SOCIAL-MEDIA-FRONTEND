@@ -16,6 +16,7 @@ export class AuthService {
     private api: ApiService,
     private router: Router,
   ) {
+    // Rehydrate state on page reload
     const token = localStorage.getItem('access_token');
     const user = localStorage.getItem('current_user');
     if (token && user) {
@@ -32,11 +33,23 @@ export class AuthService {
     return this.isAuthenticatedSubject.value;
   }
 
-  register(data: { username: string; email: string; password: string; displayName?: string }): Observable<AuthResponse> {
-    return this.api.post<AuthResponse>('/auth/register', data).pipe(
+  // ─── Registration & OTP ───────────────────────────────────────────────────
+
+  register(data: { username: string; email: string; password: string; displayName?: string }): Observable<{ message: string }> {
+    return this.api.post<{ message: string }>('/auth/register', data);
+  }
+
+  verifyEmail(email: string, otp: string): Observable<AuthResponse> {
+    return this.api.post<AuthResponse>('/auth/verify-email', { email, otp }).pipe(
       tap((response) => this.handleAuthSuccess(response)),
     );
   }
+
+  resendOtp(email: string): Observable<{ message: string }> {
+    return this.api.post<{ message: string }>('/auth/resend-otp', { email });
+  }
+
+  // ─── Login & Tokens ───────────────────────────────────────────────────────
 
   login(data: { email: string; password: string }): Observable<AuthResponse> {
     return this.api.post<AuthResponse>('/auth/login', data).pipe(
@@ -44,20 +57,23 @@ export class AuthService {
     );
   }
 
-  forgotPassword(email: string): Observable<{ message: string }> {
-    return this.api.post<{ message: string }>('/auth/forgot-password', { email });
-  }
-
-  resetPassword(token: string, newPassword: string): Observable<{ message: string }> {
-    return this.api.post<{ message: string }>('/auth/reset-password', { token, newPassword });
+  /**
+   * Called by the auth interceptor when a 401 is received.
+   * The HttpOnly cookie is sent automatically by the browser.
+   * Returns the new access token on success.
+   */
+  refreshAccessToken(): Observable<AuthResponse> {
+    return this.api.post<AuthResponse>('/auth/refresh', {}).pipe(
+      tap((response) => {
+        localStorage.setItem('access_token', response.accessToken);
+      }),
+    );
   }
 
   logout(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('current_user');
-    this.isAuthenticatedSubject.next(false);
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/auth/login']);
+    // Tell backend to revoke the refresh token + clear the cookie
+    this.api.post<void>('/auth/logout', {}).subscribe({ error: () => {} });
+    this.clearLocalState();
   }
 
   getToken(): string | null {
@@ -69,11 +85,31 @@ export class AuthService {
     this.currentUserSubject.next(user);
   }
 
-  // Called after OAuth redirect
+  clearLocalState(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('current_user');
+    this.isAuthenticatedSubject.next(false);
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/auth/login']);
+  }
+
+  // Called after OAuth redirect — only access token comes via URL
   handleOAuthToken(token: string): void {
     localStorage.setItem('access_token', token);
     this.isAuthenticatedSubject.next(true);
   }
+
+  // ─── Password Reset ───────────────────────────────────────────────────────
+
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.api.post<{ message: string }>('/auth/forgot-password', { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<{ message: string }> {
+    return this.api.post<{ message: string }>('/auth/reset-password', { token, newPassword });
+  }
+
+  // ─── Helpers ─────────────────────────────────────────────────────────────
 
   private handleAuthSuccess(response: AuthResponse): void {
     localStorage.setItem('access_token', response.accessToken);

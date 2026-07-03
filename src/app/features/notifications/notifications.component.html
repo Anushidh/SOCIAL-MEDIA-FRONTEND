@@ -35,7 +35,7 @@
 
       <div class="space-y-2">
         @for (notif of notifications; track notif.id) {
-          <div class="bg-white rounded-xl border p-4 flex items-start gap-3 transition-colors cursor-pointer"
+          <div class="bg-white rounded-xl border p-4 flex items-start gap-3 transition-colors cursor-pointer group"
                [class.border-primary-100]="!notif.isRead"
                [class.bg-primary-50]="!notif.isRead"
                [class.border-gray-100]="notif.isRead"
@@ -51,9 +51,19 @@
               </p>
               <p class="text-xs text-gray-400 mt-0.5">{{ notif.createdAt | timeAgo }}</p>
             </div>
-            @if (!notif.isRead) {
-              <div class="w-2 h-2 rounded-full bg-primary-500 flex-shrink-0 mt-1"></div>
-            }
+            <div class="flex items-center gap-2 flex-shrink-0">
+              @if (!notif.isRead) {
+                <div class="w-2 h-2 rounded-full bg-primary-500"></div>
+              }
+              <button
+                (click)="deleteNotification(notif, $event)"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500 p-1 rounded"
+                title="Delete notification">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
           </div>
         }
       </div>

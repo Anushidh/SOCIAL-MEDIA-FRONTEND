@@ -44,12 +44,13 @@ export class RightSidebarComponent implements OnInit {
   }
 
   loadSuggested(): void {
-    // Load explore users — pick a few not followed by current user
-    this.usersService.search('', 1, 5).subscribe({
+    // Get users the current user is NOT already following
+    this.usersService.getSuggestedUsers().subscribe({
       next: (res) => {
         this.suggestedUsers = res.data
           .filter((u) => u.id !== this.currentUser?.id)
-          .slice(0, 4);
+          .slice(0, 4)
+          .map((u) => ({ ...u, isFollowing: false }));
       },
       error: () => {},
     });

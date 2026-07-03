@@ -28,7 +28,11 @@ export class UsersService {
   }
 
   search(query: string, page = 1, limit = 20): Observable<PaginatedResponse<User>> {
-    return this.api.get<PaginatedResponse<User>>(`/users/search?q=${query}&page=${page}&limit=${limit}`);
+    return this.api.get<PaginatedResponse<User>>(`/users/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
+  }
+
+  getSuggestedUsers(limit = 5): Observable<PaginatedResponse<User>> {
+    return this.api.get<PaginatedResponse<User>>(`/users/suggested?limit=${limit}`);
   }
 
   follow(userId: string): Observable<any> {

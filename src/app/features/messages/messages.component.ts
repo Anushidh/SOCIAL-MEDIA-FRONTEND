@@ -1,11 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, Subscription } from 'rxjs';
 import { MessagesService } from '../../core/services/messages.service';
 import { UsersService } from '../../core/services/users.service';
 import { AuthService } from '../../core/services/auth.service';
+import { SocketService } from '../../core/services/socket.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Conversation, Message, User } from '../../core/models';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
@@ -17,7 +18,7 @@ import { TimeAgoPipe } from '../../shared/pipes/time-ago.pipe';
   imports: [CommonModule, FormsModule, AvatarComponent, TimeAgoPipe],
   templateUrl: './messages.component.html',
 })
-export class MessagesComponent implements OnInit, AfterViewChecked {
+export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
 
   conversations: Conversation[] = [];
@@ -32,12 +33,18 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
   searchedUsers: User[] = [];
   currentUserId: string | undefined;
 
+  // Typing indicators
+  typingUsers: Set<string> = new Set();
+  private typingTimeout: ReturnType<typeof setTimeout> | null = null;
+
   private userSearchSubject = new Subject<string>();
+  private subscriptions = new Subscription();
 
   constructor(
     private messagesService: MessagesService,
     private usersService: UsersService,
     private authService: AuthService,
+    private socketService: SocketService,
     private toast: ToastService,
     private route: ActivatedRoute,
   ) {
@@ -46,33 +53,82 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.loadConversations();
+    this.socketService.connectChat();
+    this.setupSocketListeners();
 
-    // Debounced user search for new chat
-    this.userSearchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-    ).subscribe((q) => {
-      if (q.length >= 2) {
-        this.usersService.search(q).subscribe({
-          next: (res) => {
-            this.searchedUsers = res.data.filter((u) => u.id !== this.currentUserId);
-          },
-        });
-      } else {
-        this.searchedUsers = [];
-      }
-    });
+    this.subscriptions.add(
+      this.userSearchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe((q) => {
+        if (q.length >= 2) {
+          this.usersService.search(q).subscribe({
+            next: (res) => {
+              this.searchedUsers = res.data.filter((u) => u.id !== this.currentUserId);
+            },
+          });
+        } else {
+          this.searchedUsers = [];
+        }
+      }),
+    );
 
-    // Open conversation from query param (e.g. coming from profile "Message" button)
-    this.route.queryParams.subscribe((params) => {
-      if (params['conversationId']) {
-        this.loadConversations(params['conversationId']);
-      }
-    });
+    this.subscriptions.add(
+      this.route.queryParams.subscribe((params) => {
+        if (params['conversationId']) {
+          this.loadConversations(params['conversationId']);
+        }
+      }),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+    if (this.activeConversation) {
+      this.socketService.leaveConversation(this.activeConversation.id);
+    }
   }
 
   ngAfterViewChecked(): void {
     this.scrollToBottom();
+  }
+
+  private setupSocketListeners(): void {
+    // New real-time message
+    this.subscriptions.add(
+      this.socketService.onChat<Message>('newMessage').subscribe((msg) => {
+        if (msg.conversationId === this.activeConversation?.id) {
+          this.messages.push(msg);
+          this.socketService.markRead(this.activeConversation.id);
+        } else {
+          // Update unread count on the conversation in the list
+          const conv = this.conversations.find((c) => c.id === msg.conversationId);
+          if (conv) conv.unreadCount = (conv.unreadCount ?? 0) + 1;
+        }
+      }),
+    );
+
+    // Typing indicators
+    this.subscriptions.add(
+      this.socketService.typing$.subscribe(({ userId, conversationId }) => {
+        if (conversationId === this.activeConversation?.id && userId !== this.currentUserId) {
+          this.typingUsers.add(userId);
+        }
+      }),
+    );
+
+    this.subscriptions.add(
+      this.socketService.stoppedTyping$.subscribe(({ userId, conversationId }) => {
+        if (conversationId === this.activeConversation?.id) {
+          this.typingUsers.delete(userId);
+        }
+      }),
+    );
+
+    // Messages read by other party
+    this.subscriptions.add(
+      this.socketService.onChat('messagesRead').subscribe(({ conversationId }) => {
+        const conv = this.conversations.find((c) => c.id === conversationId);
+        if (conv) conv.unreadCount = 0;
+      }),
+    );
   }
 
   loadConversations(openConversationId?: string): void {
@@ -100,7 +156,6 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
         this.showNewChat = false;
         this.newChatQuery = '';
         this.searchedUsers = [];
-        // Add to list if not already there
         if (!this.conversations.find((c) => c.id === conv.id)) {
           this.conversations.unshift(conv);
         }
@@ -111,17 +166,25 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
   }
 
   openConversation(conv: Conversation): void {
+    if (this.activeConversation) {
+      this.socketService.leaveConversation(this.activeConversation.id);
+    }
     this.activeConversation = conv;
     this.messages = [];
+    this.typingUsers.clear();
     this.loadingMessages = true;
+
+    this.socketService.joinConversation(conv.id);
+
     this.messagesService.getMessages(conv.id).subscribe({
       next: (res) => {
-        this.messages = [...res.data].reverse(); // newest last
+        this.messages = [...res.data].reverse();
         this.loadingMessages = false;
         conv.unreadCount = 0;
         this.messagesService.markAsRead(conv.id).subscribe();
+        this.socketService.markRead(conv.id);
       },
-      error: () => this.loadingMessages = false,
+      error: () => (this.loadingMessages = false),
     });
   }
 
@@ -142,6 +205,23 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
         this.toast.error('Failed to send message');
       },
     });
+  }
+
+  onTyping(): void {
+    if (!this.activeConversation) return;
+    this.socketService.sendTyping(this.activeConversation.id);
+
+    // Auto-stop typing after 3 seconds of inactivity
+    if (this.typingTimeout) clearTimeout(this.typingTimeout);
+    this.typingTimeout = setTimeout(() => {
+      if (this.activeConversation) {
+        this.socketService.sendStopTyping(this.activeConversation.id);
+      }
+    }, 3000);
+  }
+
+  get isTyping(): boolean {
+    return this.typingUsers.size > 0;
   }
 
   getOtherParticipant(conv: Conversation) {

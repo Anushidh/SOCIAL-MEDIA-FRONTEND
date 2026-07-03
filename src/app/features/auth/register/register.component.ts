@@ -40,7 +40,12 @@ export class RegisterComponent {
     if (this.form.invalid) return;
     this.loading = true;
     this.authService.register(this.form.value as any).subscribe({
-      next: () => this.router.navigate(['/feed']),
+      next: () => {
+        // Registration just sends OTP — redirect to verify-email page
+        this.router.navigate(['/auth/verify-email'], {
+          queryParams: { email: this.form.value.email },
+        });
+      },
       error: (err) => {
         this.loading = false;
         this.toast.error(err.error?.message ?? 'Registration failed');

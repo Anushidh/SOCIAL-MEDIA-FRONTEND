@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { NotificationsService } from '../../core/services/notifications.service';
+import { SocketService } from '../../core/services/socket.service';
 import { Notification, NotificationType } from '../../core/models';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import { TimeAgoPipe } from '../../shared/pipes/time-ago.pipe';
@@ -12,19 +14,36 @@ import { TimeAgoPipe } from '../../shared/pipes/time-ago.pipe';
   imports: [CommonModule, RouterLink, AvatarComponent, TimeAgoPipe],
   templateUrl: './notifications.component.html',
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   loading = false;
   hasMore = false;
   page = 1;
+  private sub = new Subscription();
 
   get hasUnread(): boolean {
     return this.notifications.some((n) => !n.isRead);
   }
 
-  constructor(private notificationsService: NotificationsService) {}
+  constructor(
+    private notificationsService: NotificationsService,
+    private socketService: SocketService,
+  ) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+
+    // Real-time: prepend new notifications as they arrive
+    this.sub.add(
+      this.socketService.onNotif<Notification>('newNotification').subscribe((notif) => {
+        this.notifications.unshift(notif);
+      }),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
 
   load(): void {
     this.loading = true;
@@ -34,7 +53,7 @@ export class NotificationsComponent implements OnInit {
         this.hasMore = res.meta.hasNext;
         this.loading = false;
       },
-      error: () => this.loading = false,
+      error: () => (this.loading = false),
     });
   }
 
@@ -47,7 +66,7 @@ export class NotificationsComponent implements OnInit {
         this.hasMore = res.meta.hasNext;
         this.loading = false;
       },
-      error: () => this.loading = false,
+      error: () => (this.loading = false),
     });
   }
 
@@ -61,6 +80,13 @@ export class NotificationsComponent implements OnInit {
   markAllRead(): void {
     this.notificationsService.markAllAsRead().subscribe(() => {
       this.notifications.forEach((n) => (n.isRead = true));
+    });
+  }
+
+  deleteNotification(notif: Notification, event: MouseEvent): void {
+    event.stopPropagation();
+    this.notificationsService.deleteNotification(notif.id).subscribe(() => {
+      this.notifications = this.notifications.filter((n) => n.id !== notif.id);
     });
   }
 

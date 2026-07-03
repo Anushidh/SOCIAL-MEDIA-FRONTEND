@@ -56,21 +56,17 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     // Connect WebSockets
     const userId = this.authService.currentUser?.id;
     if (userId) {
-      this.socketService.connectNotifications(userId);
-      this.socketService.connectChat(userId);
+      this.socketService.connectNotifications();
+      this.socketService.connectChat();
 
       // Listen for real-time notification badge updates
-      this.socketService.notifEvents$.subscribe((msg: any) => {
-        if (msg.event === 'unreadCount') {
-          this.notificationsService.setUnreadCount(msg.data.count);
-        }
+      this.socketService.onNotif<{ count: number }>('unreadCount').subscribe((data) => {
+        this.notificationsService.setUnreadCount(data.count);
       });
 
       // Listen for real-time message unread count
-      this.socketService.chatEvents$.subscribe((msg: any) => {
-        if (msg.event === 'messageNotification') {
-          this.messagesService.getUnreadCount().subscribe();
-        }
+      this.socketService.onChat('messageNotification').subscribe(() => {
+        this.messagesService.getUnreadCount().subscribe();
       });
     }
   }

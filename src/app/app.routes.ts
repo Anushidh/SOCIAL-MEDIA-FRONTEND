@@ -39,6 +39,13 @@ export const routes: Routes = [
             (m) => m.OAuthCallbackComponent,
           ),
       },
+      {
+        path: 'verify-email',
+        loadComponent: () =>
+          import('./features/auth/verify-email/verify-email.component').then(
+            (m) => m.VerifyEmailComponent,
+          ),
+      },
       { path: '', redirectTo: 'login', pathMatch: 'full' },
     ],
   },
@@ -62,6 +69,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/post/post-detail/post-detail.component').then(
             (m) => m.PostDetailComponent,
+          ),
+      },
+      {
+        path: 'post/create',
+        loadComponent: () =>
+          import('./features/post/create-post/create-post.component').then(
+            (m) => m.CreatePostComponent,
           ),
       },
 

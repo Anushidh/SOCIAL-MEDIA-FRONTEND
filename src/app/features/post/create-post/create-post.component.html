@@ -1,0 +1,80 @@
+<div class="max-w-2xl mx-auto px-4 py-6">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+
+    <div class="flex items-center gap-3 mb-5">
+      <button (click)="goBack()" class="text-gray-400 hover:text-gray-600 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+      </button>
+      <h1 class="text-xl font-bold text-gray-900">Create Post</h1>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Content -->
+      <div class="mb-4">
+        <textarea
+          formControlName="content"
+          rows="5"
+          placeholder="What's on your mind?"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [class.border-red-400]="submitted && f['content'].invalid"
+        ></textarea>
+        <div class="flex justify-between mt-1">
+          @if (submitted && f['content'].errors?.['required']) {
+            <p class="text-red-500 text-xs">Content is required</p>
+          } @else if (submitted && f['content'].errors?.['maxlength']) {
+            <p class="text-red-500 text-xs">Max 2000 characters</p>
+          } @else {
+            <span></span>
+          }
+          <span class="text-xs text-gray-400">{{ f['content'].value?.length ?? 0 }}/2000</span>
+        </div>
+      </div>
+
+      <!-- Image previews -->
+      @if (previewUrls.length > 0) {
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          @for (url of previewUrls; track url; let i = $index) {
+            <div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+              <img [src]="url" class="w-full h-full object-cover" alt="Preview"/>
+              <button
+                type="button"
+                (click)="removeImage(i)"
+                class="absolute top-1 right-1 bg-black/50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-black/70">
+                ✕
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Actions -->
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+        <label class="cursor-pointer flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span>{{ selectedFiles.length > 0 ? selectedFiles.length + ' / ' + MAX_IMAGES + ' images' : 'Add images' }}</span>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            class="hidden"
+            (change)="onFilesSelected($event)"
+            [disabled]="selectedFiles.length >= MAX_IMAGES"/>
+        </label>
+
+        <button
+          type="submit"
+          [disabled]="uploading"
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-6 py-2 rounded-lg text-sm transition">
+          {{ uploading ? 'Posting...' : 'Post' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

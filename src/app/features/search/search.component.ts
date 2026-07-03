@@ -90,17 +90,14 @@ export class SearchComponent implements OnInit {
         error: () => { this.loading = false; },
       });
     } else {
-      // General search — fetch users and posts in parallel
+      // General search — fetch users and posts in parallel using real search APIs
       forkJoin({
         users: this.usersService.search(trimmed),
-        posts: this.postsService.getExplore(1, 20),
+        posts: this.postsService.searchPosts(trimmed),
       }).subscribe({
         next: ({ users, posts }) => {
           this.users = users.data;
-          // Client-side filter posts by content
-          this.posts = posts.data.filter((p) =>
-            p.content?.toLowerCase().includes(trimmed.toLowerCase()),
-          );
+          this.posts = posts.data;
           this.loading = false;
         },
         error: () => { this.loading = false; },
