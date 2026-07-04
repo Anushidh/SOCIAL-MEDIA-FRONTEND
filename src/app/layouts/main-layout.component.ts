@@ -85,6 +85,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   }
 
   showLogoutConfirm = false;
+  showMoreMenu = false;
 
   logout(): void {
     this.authService.logout();

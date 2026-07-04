@@ -57,7 +57,7 @@
             <!-- Relative container required for fill mode -->
             <div class="relative overflow-hidden rounded-lg"
                  [class.col-span-2]="(post.imageUrls?.length ?? 0) === 1"
-                 [ngClass]="(post.imageUrls?.length ?? 0) === 1 ? 'h-80' : 'h-44'">
+                 [ngClass]="(post.imageUrls?.length ?? 0) === 1 ? 'h-80' : 'h-36 sm:h-44'">
               <img
                 [ngSrc]="img"
                 fill

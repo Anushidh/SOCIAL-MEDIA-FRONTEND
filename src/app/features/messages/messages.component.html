@@ -1,5 +1,5 @@
 
-    <div class="h-screen md:h-auto md:min-h-[calc(100vh-0px)] flex">
+    <div class="h-[calc(100vh-3.5rem)] md:h-auto md:min-h-[calc(100vh-0px)] flex">
 
       <!-- Conversations sidebar -->
       <div class="w-full md:w-80 bg-white border-r border-gray-100 flex flex-col"
@@ -139,7 +139,7 @@
           </div>
 
           <!-- Message input -->
-          <div class="bg-white border-t border-gray-100 p-3">
+          <div class="bg-white border-t border-gray-100 p-3 pb-[calc(0.75rem+3.5rem)] md:pb-3">
             <div class="flex items-center gap-2">
               <input [(ngModel)]="messageInput" (keyup.enter)="sendMessage()"
                      placeholder="Message…"

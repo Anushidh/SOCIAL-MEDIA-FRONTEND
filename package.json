@@ -28,7 +28,6 @@
     "@angular/cli": "^18.2.21",
     "@angular/compiler-cli": "^18.2.0",
     "@types/jasmine": "~5.1.0",
-    "@types/socket.io-client": "^1.4.36",
     "autoprefixer": "^10.4.19",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",

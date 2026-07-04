@@ -67,17 +67,17 @@ export const routes: Routes = [
 
       // Post detail
       {
-        path: 'post/:id',
-        loadComponent: () =>
-          import('./features/post/post-detail/post-detail.component').then(
-            (m) => m.PostDetailComponent,
-          ),
-      },
-      {
         path: 'post/create',
         loadComponent: () =>
           import('./features/post/create-post/create-post.component').then(
             (m) => m.CreatePostComponent,
+          ),
+      },
+      {
+        path: 'post/:id',
+        loadComponent: () =>
+          import('./features/post/post-detail/post-detail.component').then(
+            (m) => m.PostDetailComponent,
           ),
       },
 

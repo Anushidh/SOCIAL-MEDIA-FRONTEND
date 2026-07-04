@@ -50,7 +50,7 @@
       <!-- Story viewer modal -->
       @if (viewingStory) {
         <div class="fixed inset-0 bg-black z-50 flex items-center justify-center" (click)="closeStory()">
-          <div class="relative max-w-sm w-full h-[80vh]" (click)="$event.stopPropagation()">
+          <div class="relative max-w-sm w-full h-[80dvh] max-h-screen" (click)="$event.stopPropagation()">
             <img [src]="viewingStory.imageUrl" class="w-full h-full object-cover rounded-2xl">
             @if (viewingStory.caption) {
               <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 rounded-b-2xl">
