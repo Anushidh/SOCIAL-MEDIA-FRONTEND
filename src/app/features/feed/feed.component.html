@@ -98,20 +98,31 @@
         @for (post of posts; track post.id) {
           <app-post-card
             [post]="post"
+            [currentUserId]="currentUserId"
             (liked)="toggleLike($event)"
             (bookmarked)="toggleBookmark($event)"
             (reposted)="toggleRepost($event)"
-            (reported)="reportingPost = $event"/>
+            (reported)="reportingPost = $event"
+            (deleted)="deletePost($event)"/>
         }
       </div>
 
-      <!-- Load more -->
+      <!-- Infinite scroll sentinel — replaces the manual "Load more" button -->
       @if (hasMore) {
-        <div class="text-center mt-6">
-          <button (click)="loadMore()" [disabled]="loading"
-                  class="px-6 py-2 text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
-            {{ loading ? 'Loading…' : 'Load more' }}
-          </button>
+        <div
+          appInfiniteScroll
+          (scrolled)="loadMore()"
+          [threshold]="0.2"
+          class="flex justify-center py-6">
+          @if (loading) {
+            <div class="flex items-center gap-2 text-gray-400 text-sm">
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+              </svg>
+              Loading more…
+            </div>
+          }
         </div>
       }
 
@@ -120,6 +131,7 @@
         <app-report-modal
           [entityId]="reportingPost.id"
           entityType="post"
+          (reported)="handleReported()"
           (close)="reportingPost = null"/>
       }
     </div>

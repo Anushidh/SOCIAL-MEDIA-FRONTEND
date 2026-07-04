@@ -18,7 +18,7 @@ import { User } from '../../../core/models';
 })
 export class RightSidebarComponent implements OnInit {
   trendingHashtags: { id: string; name: string; postsCount: number }[] = [];
-  suggestedUsers: (User & { isFollowing?: boolean })[] = [];
+  suggestedUsers: (User & { isFollowing?: boolean; isRequested?: boolean })[] = [];
   searchQuery = '';
 
   get currentUser() { return this.authService.currentUser; }
@@ -50,7 +50,7 @@ export class RightSidebarComponent implements OnInit {
         this.suggestedUsers = res.data
           .filter((u) => u.id !== this.currentUser?.id)
           .slice(0, 4)
-          .map((u) => ({ ...u, isFollowing: false }));
+          .map((u) => ({ ...u, isFollowing: false, isRequested: false }));
       },
       error: () => {},
     });
@@ -65,11 +65,17 @@ export class RightSidebarComponent implements OnInit {
     }
   }
 
-  follow(user: User & { isFollowing?: boolean }): void {
+  follow(user: User & { isFollowing?: boolean; isRequested?: boolean }): void {
+    if (user.isFollowing || user.isRequested) return; // Prevent double click
     this.usersService.follow(user.id).subscribe({
-      next: () => {
-        user.isFollowing = true;
-        this.toast.success(`Following @${user.username}`);
+      next: (res) => {
+        if (res.requested) {
+          user.isRequested = true;
+          this.toast.success(`Follow request sent to @${user.username}`);
+        } else {
+          user.isFollowing = true;
+          this.toast.success(`Following @${user.username}`);
+        }
       },
       error: () => {},
     });

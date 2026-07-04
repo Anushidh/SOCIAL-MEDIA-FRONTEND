@@ -9,11 +9,12 @@ import { Post } from '../../core/models';
 import { PostCardComponent } from '../../shared/components/post-card/post-card.component';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import { ReportModalComponent } from '../../shared/components/report-modal/report-modal.component';
+import { InfiniteScrollDirective } from '../../shared/directives/infinite-scroll.directive';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, PostCardComponent, AvatarComponent, ReportModalComponent],
+  imports: [CommonModule, RouterLink, FormsModule, PostCardComponent, AvatarComponent, ReportModalComponent, InfiniteScrollDirective],
   templateUrl: './feed.component.html',
 })
 export class FeedComponent implements OnInit {
@@ -28,6 +29,7 @@ export class FeedComponent implements OnInit {
   reportingPost: Post | null = null;
 
   get currentUser() { return this.authService.currentUser; }
+  get currentUserId() { return this.authService.currentUser?.id; }
 
   constructor(
     private postsService: PostsService,
@@ -57,6 +59,7 @@ export class FeedComponent implements OnInit {
   }
 
   loadMore(): void {
+    if (this.loading || !this.hasMore) return;
     this.page++;
     this.loading = true;
     const obs = this.activeTab === 'feed'
@@ -133,5 +136,22 @@ export class FeedComponent implements OnInit {
         this.toast.success('Reposted!');
       });
     }
+  }
+
+  handleReported(): void {
+    if (this.reportingPost) {
+      this.reportingPost.isReported = true;
+    }
+    this.reportingPost = null;
+  }
+
+  deletePost(post: Post): void {
+    this.postsService.delete(post.id).subscribe({
+      next: () => {
+        this.posts = this.posts.filter((p) => p.id !== post.id);
+        this.toast.success('Post deleted');
+      },
+      error: () => this.toast.error('Failed to delete post'),
+    });
   }
 }

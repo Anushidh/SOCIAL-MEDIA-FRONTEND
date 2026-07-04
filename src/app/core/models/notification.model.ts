@@ -4,6 +4,7 @@ export enum NotificationType {
   LIKE = 'like',
   COMMENT = 'comment',
   FOLLOW = 'follow',
+  FOLLOW_REQUEST = 'follow_request',
   MESSAGE = 'message',
   MENTION = 'mention',
 }

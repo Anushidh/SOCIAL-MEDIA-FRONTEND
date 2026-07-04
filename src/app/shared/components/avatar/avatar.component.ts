@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-avatar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgOptimizedImage],
   templateUrl: './avatar.component.html',
 })
 export class AvatarComponent {
@@ -21,6 +21,12 @@ export class AvatarComponent {
 
   get textClass(): string {
     const map = { xs: 'text-xs', sm: 'text-xs', md: 'text-sm', lg: 'text-base', xl: 'text-xl' };
+    return map[this.size];
+  }
+
+  /** Pixel dimension for NgOptimizedImage width/height (always square). */
+  get pixelSize(): number {
+    const map = { xs: 24, sm: 32, md: 40, lg: 48, xl: 64 };
     return map[this.size];
   }
 }

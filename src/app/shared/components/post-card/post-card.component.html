@@ -11,7 +11,37 @@
             <p class="text-xs text-gray-400">&#64;{{ post.author?.username }}</p>
           </div>
         </a>
-        <span class="text-xs text-gray-400">{{ post.createdAt | timeAgo }}</span>
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-400">{{ post.createdAt | timeAgo }}</span>
+
+          <!-- Three-dot menu — own posts only -->
+          @if (isOwnPost) {
+            <div class="relative">
+              <button (click)="toggleMenu($event)"
+                      class="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="5" cy="12" r="1.5"/>
+                  <circle cx="12" cy="12" r="1.5"/>
+                  <circle cx="19" cy="12" r="1.5"/>
+                </svg>
+              </button>
+              @if (menuOpen) {
+                <div class="absolute right-0 top-7 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1"
+                     (click)="$event.stopPropagation()">
+                  <button (click)="onDelete()"
+                          class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Delete post
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
       </div>
 
       <!-- Content -->
@@ -24,11 +54,15 @@
         <div class="mb-3 rounded-lg overflow-hidden"
              [ngClass]="(post.imageUrls?.length ?? 0) === 1 ? '' : 'grid grid-cols-2 gap-1'">
           @for (img of (post.imageUrls ?? []).slice(0, 4); track img; let i = $index) {
-            <div class="relative" [class.col-span-2]="(post.imageUrls?.length ?? 0) === 1">
-              <img [src]="img" alt="Post image"
-                   class="w-full object-cover rounded-lg"
-                   [class.max-h-80]="(post.imageUrls?.length ?? 0) === 1"
-                   [class.h-44]="(post.imageUrls?.length ?? 0) > 1">
+            <!-- Relative container required for fill mode -->
+            <div class="relative overflow-hidden rounded-lg"
+                 [class.col-span-2]="(post.imageUrls?.length ?? 0) === 1"
+                 [ngClass]="(post.imageUrls?.length ?? 0) === 1 ? 'h-80' : 'h-44'">
+              <img
+                [ngSrc]="img"
+                fill
+                alt="Post image"
+                class="object-cover">
               @if (i === 3 && (post.imageUrls?.length ?? 0) > 4) {
                 <div class="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
                   <span class="text-white font-bold text-xl">+{{ (post.imageUrls?.length ?? 0) - 4 }}</span>
@@ -82,22 +116,44 @@
           <span class="text-xs font-medium">{{ post.repostsCount }}</span>
         </button>
 
-        <!-- Bookmark -->
-        <button (click)="onBookmark()" class="ml-auto flex items-center text-gray-400 hover:text-primary-500 transition-colors"
-                [class.text-primary-500]="post.isBookmarked">
-          <svg class="w-5 h-5" [attr.fill]="post.isBookmarked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-          </svg>
-        </button>
+        <!-- Bookmark — hidden on own posts -->
+        @if (!isOwnPost) {
+          <button (click)="onBookmark()" class="ml-auto flex items-center text-gray-400 hover:text-primary-500 transition-colors"
+                  [class.text-primary-500]="post.isBookmarked">
+            <svg class="w-5 h-5" [attr.fill]="post.isBookmarked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+            </svg>
+          </button>
+        } @else {
+          <!-- spacer to keep layout consistent -->
+          <span class="ml-auto"></span>
+        }
 
-        <!-- Report -->
-        <button (click)="onReport()" class="flex items-center text-gray-300 hover:text-red-400 transition-colors ml-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-          </svg>
-        </button>
+        <!-- Report — hidden on own posts, locked after reporting -->
+        @if (!isOwnPost) {
+          <button
+            (click)="onReport()"
+            [disabled]="post.isReported"
+            [title]="post.isReported ? 'Already reported' : 'Report post'"
+            class="flex items-center transition-colors ml-2"
+            [ngClass]="post.isReported ? 'text-red-300 cursor-default' : 'text-gray-300 hover:text-red-400'">
+            <svg class="w-4 h-4" [attr.fill]="post.isReported ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </button>
+        }
       </div>
     </div>
+
+    <!-- Delete confirmation modal -->
+    @if (showDeleteConfirm) {
+      <app-confirm-modal
+        title="Delete post?"
+        message="This can't be undone. The post will be permanently removed."
+        confirmLabel="Delete"
+        (confirmed)="confirmDelete()"
+        (cancelled)="showDeleteConfirm = false"/>
+    }
   

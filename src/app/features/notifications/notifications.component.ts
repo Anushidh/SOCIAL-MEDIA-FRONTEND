@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NotificationsService } from '../../core/services/notifications.service';
 import { SocketService } from '../../core/services/socket.service';
+import { UsersService } from '../../core/services/users.service';
 import { Notification, NotificationType } from '../../core/models';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import { TimeAgoPipe } from '../../shared/pipes/time-ago.pipe';
@@ -28,6 +29,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   constructor(
     private notificationsService: NotificationsService,
     private socketService: SocketService,
+    private usersService: UsersService,
   ) {}
 
   ngOnInit(): void {
@@ -90,11 +92,31 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     });
   }
 
+  acceptRequest(notif: Notification, event: MouseEvent): void {
+    event.stopPropagation();
+    if (notif.entityId) {
+      this.usersService.acceptFollowRequest(notif.entityId).subscribe(() => {
+        // Change notification type visually or remove it
+        this.notifications = this.notifications.filter((n) => n.id !== notif.id);
+      });
+    }
+  }
+
+  denyRequest(notif: Notification, event: MouseEvent): void {
+    event.stopPropagation();
+    if (notif.entityId) {
+      this.usersService.denyFollowRequest(notif.entityId).subscribe(() => {
+        this.notifications = this.notifications.filter((n) => n.id !== notif.id);
+      });
+    }
+  }
+
   getNotificationText(type: NotificationType): string {
     const map: Record<NotificationType, string> = {
       [NotificationType.LIKE]: 'liked your post',
       [NotificationType.COMMENT]: 'commented on your post',
       [NotificationType.FOLLOW]: 'started following you',
+      [NotificationType.FOLLOW_REQUEST]: 'requested to follow you',
       [NotificationType.MESSAGE]: 'sent you a message',
       [NotificationType.MENTION]: 'mentioned you in a post',
     };

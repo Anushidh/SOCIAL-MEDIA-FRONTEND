@@ -32,14 +32,25 @@
               <p class="font-bold text-gray-900 text-base">{{ user.postsCount ?? 0 }}</p>
               <p class="text-xs text-gray-400">Posts</p>
             </div>
-            <a [routerLink]="['/profile', user.username, 'followers']" class="text-center hover:opacity-80">
-              <p class="font-bold text-gray-900 text-base">{{ user.followersCount ?? 0 }}</p>
-              <p class="text-xs text-gray-400">Followers</p>
-            </a>
-            <a [routerLink]="['/profile', user.username, 'following']" class="text-center hover:opacity-80">
-              <p class="font-bold text-gray-900 text-base">{{ user.followingCount ?? 0 }}</p>
-              <p class="text-xs text-gray-400">Following</p>
-            </a>
+            @if (user.isPrivate && !isFollowing && !isOwnProfile) {
+              <div class="text-center">
+                <p class="font-bold text-gray-900 text-base">{{ user.followersCount ?? 0 }}</p>
+                <p class="text-xs text-gray-400">Followers</p>
+              </div>
+              <div class="text-center">
+                <p class="font-bold text-gray-900 text-base">{{ user.followingCount ?? 0 }}</p>
+                <p class="text-xs text-gray-400">Following</p>
+              </div>
+            } @else {
+              <a [routerLink]="['/profile', user.username, 'followers']" class="text-center hover:opacity-80">
+                <p class="font-bold text-gray-900 text-base">{{ user.followersCount ?? 0 }}</p>
+                <p class="text-xs text-gray-400">Followers</p>
+              </a>
+              <a [routerLink]="['/profile', user.username, 'following']" class="text-center hover:opacity-80">
+                <p class="font-bold text-gray-900 text-base">{{ user.followingCount ?? 0 }}</p>
+                <p class="text-xs text-gray-400">Following</p>
+              </a>
+            }
           </div>
 
           <!-- Actions -->
@@ -51,48 +62,152 @@
             } @else {
               <button (click)="toggleFollow()"
                       class="flex-1 py-2 text-sm font-semibold rounded-lg transition-colors"
-                      [class.bg-primary-600]="!isFollowing"
-                      [class.hover:bg-primary-700]="!isFollowing"
-                      [class.text-white]="!isFollowing"
-                      [class.border]="isFollowing"
-                      [class.border-gray-200]="isFollowing"
-                      [class.hover:bg-gray-50]="isFollowing"
-                      [class.text-gray-700]="isFollowing">
-                {{ isFollowing ? 'Following' : 'Follow' }}
+                      [class.bg-primary-600]="!isFollowing && !isRequested"
+                      [class.hover:bg-primary-700]="!isFollowing && !isRequested"
+                      [class.text-white]="!isFollowing && !isRequested"
+                      [class.border]="isFollowing || isRequested"
+                      [class.border-gray-200]="isFollowing || isRequested"
+                      [class.hover:bg-gray-50]="isFollowing || isRequested"
+                      [class.text-gray-700]="isFollowing || isRequested">
+                @if (isFollowing) {
+                  Following
+                } @else if (isRequested) {
+                  Requested
+                } @else {
+                  Follow
+                }
               </button>
               <button (click)="messageUser()" class="px-4 py-2 text-sm font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
                 Message
+              </button>
+              <button (click)="toggleBlock()" 
+                      class="px-4 py-2 text-sm font-semibold border rounded-lg transition-colors"
+                      [class.border-red-200]="!isBlocked"
+                      [class.text-red-600]="!isBlocked"
+                      [class.hover:bg-red-50]="!isBlocked"
+                      [class.bg-red-600]="isBlocked"
+                      [class.text-white]="isBlocked"
+                      [class.border-red-600]="isBlocked"
+                      [class.hover:bg-red-700]="isBlocked">
+                {{ isBlocked ? 'Unblock' : 'Block' }}
               </button>
             }
           </div>
         </div>
 
-        <!-- Posts -->
-        <h2 class="font-bold text-gray-900 mb-3">Posts</h2>
-
-        @if (posts.length === 0 && !postsLoading) {
-          <div class="text-center py-12 bg-white rounded-2xl border border-gray-100">
-            <p class="text-gray-400">No posts yet</p>
+        @if (user.isPrivate && !isFollowing && !isOwnProfile) {
+          <div class="bg-white rounded-2xl border border-gray-100 p-12 text-center mt-4">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">This account is private</h3>
+            <p class="text-gray-500 max-w-sm mx-auto">Follow this account to see their photos and videos.</p>
           </div>
-        }
-
-        <div class="space-y-4">
-          @for (post of posts; track post.id) {
-            <app-post-card [post]="post"
-              (liked)="toggleLike($event)"
-              (bookmarked)="toggleBookmark($event)"
-              (reposted)="toggleRepost($event)"
-              (reported)="reportingPost = $event"/>
-          }
-        </div>
-
-        @if (hasMorePosts) {
-          <div class="text-center mt-5">
-            <button (click)="loadMorePosts()" [disabled]="postsLoading"
-                    class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
-              Load more posts
+        } @else {
+          <!-- Tabs -->
+          <div class="flex bg-white rounded-xl border border-gray-100 mb-4">
+            <button (click)="switchTab('posts')"
+                    class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
+                    [class.bg-primary-600]="activeTab === 'posts'"
+                    [class.text-white]="activeTab === 'posts'"
+                    [class.text-gray-500]="activeTab !== 'posts'">
+              Posts
+            </button>
+            <button (click)="switchTab('reposts')"
+                    class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
+                    [class.bg-primary-600]="activeTab === 'reposts'"
+                    [class.text-white]="activeTab === 'reposts'"
+                    [class.text-gray-500]="activeTab !== 'reposts'">
+              Reposts
             </button>
           </div>
+
+          <!-- Posts tab -->
+          @if (activeTab === 'posts') {
+            @if (posts.length === 0 && !postsLoading) {
+              <div class="text-center py-12 bg-white rounded-2xl border border-gray-100">
+                <p class="text-gray-400">No posts yet</p>
+              </div>
+            }
+
+            <div class="space-y-4">
+              @for (post of posts; track post.id) {
+                <app-post-card [post]="post"
+                  [currentUserId]="currentUserId"
+                  (liked)="toggleLike($event)"
+                  (bookmarked)="toggleBookmark($event)"
+                  (reposted)="toggleRepost($event)"
+                  (reported)="reportingPost = $event"
+                  (deleted)="deletePost($event)"/>
+              }
+            </div>
+
+            @if (hasMorePosts) {
+              <div class="text-center mt-5">
+                <button (click)="loadMorePosts()" [disabled]="postsLoading"
+                        class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+                  Load more posts
+                </button>
+              </div>
+            }
+          }
+
+          <!-- Reposts tab -->
+          @if (activeTab === 'reposts') {
+            @if (postsLoading && reposts.length === 0) {
+              <div class="space-y-4">
+                @for (i of [1,2]; track i) {
+                  <div class="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+                    <div class="flex items-center gap-3 mb-3">
+                      <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+                      <div class="flex-1"><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+                    </div>
+                    <div class="h-3 bg-gray-200 rounded w-full mb-1.5"></div>
+                    <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (reposts.length === 0 && !postsLoading) {
+              <div class="text-center py-12 bg-white rounded-2xl border border-gray-100">
+                <p class="text-gray-400">No reposts yet</p>
+              </div>
+            }
+
+            <div class="space-y-4">
+              @for (post of reposts; track post.id) {
+                <!-- Reposted-by label -->
+                <div>
+                  <p class="text-xs text-gray-400 flex items-center gap-1 mb-1 px-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    {{ user!.displayName }} reposted
+                  </p>
+                  <app-post-card [post]="post"
+                    [currentUserId]="currentUserId"
+                    (liked)="toggleLike($event)"
+                    (bookmarked)="toggleBookmark($event)"
+                    (reposted)="toggleRepost($event)"
+                    (reported)="reportingPost = $event"
+                    (deleted)="deletePost($event)"/>
+                </div>
+              }
+            </div>
+
+            @if (hasMoreReposts) {
+              <div class="text-center mt-5">
+                <button (click)="loadMoreReposts()" [disabled]="postsLoading"
+                        class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+                  Load more
+                </button>
+              </div>
+            }
+          }
         }
       }
 
@@ -100,6 +215,7 @@
         <app-report-modal
           [entityId]="reportingPost.id"
           entityType="post"
+          (reported)="handleReported()"
           (close)="reportingPost = null"/>
       }
     </div>

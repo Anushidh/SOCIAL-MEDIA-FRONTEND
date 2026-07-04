@@ -63,6 +63,19 @@
         </a>
       </div>
 
+      <!-- Blocked Users -->
+      <div class="bg-white rounded-2xl border border-gray-100 p-5 mb-4">
+        <a routerLink="/settings/blocked-users" class="flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-gray-900 text-sm">View Blocked Users</p>
+            <p class="text-xs text-gray-400 mt-0.5">Manage accounts you have blocked</p>
+          </div>
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
       <!-- Change password -->
       <div class="bg-white rounded-2xl border border-gray-100 p-5 mb-4">
         <h2 class="font-semibold text-gray-900 mb-4">Change Password</h2>
@@ -95,5 +108,16 @@
           Deactivate Account
         </button>
       </div>
+
+      <!-- Deactivate confirmation modal -->
+      @if (showDeactivateConfirm) {
+        <app-confirm-modal
+          title="Deactivate Account?"
+          message="Deactivating your account will hide your profile from others. You can reactivate by logging in again."
+          confirmLabel="Deactivate"
+          [loading]="isDeactivating"
+          (confirmed)="confirmDeactivate()"
+          (cancelled)="showDeactivateConfirm = false"/>
+      }
     </div>
   

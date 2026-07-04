@@ -109,7 +109,7 @@
         </nav>
 
         <div class="px-3 py-4 border-t border-gray-100">
-          <button (click)="logout()"
+          <button (click)="showLogoutConfirm = true"
                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 w-full transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -189,5 +189,12 @@
       </nav>
     </div>
 
-    <app-toast-container/>
+    @if (showLogoutConfirm) {
+      <app-confirm-modal
+        title="Sign out?"
+        message="You'll need to log back in to access your account."
+        confirmLabel="Sign out"
+        (confirmed)="logout()"
+        (cancelled)="showLogoutConfirm = false"/>
+    }
   

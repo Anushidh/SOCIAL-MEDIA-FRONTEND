@@ -1,0 +1,37 @@
+<div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+  <!-- Back button -->
+  <a routerLink="/settings" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 mb-6">
+    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Settings
+  </a>
+
+  <h1 class="text-xl font-bold text-gray-900 mb-2">Blocked Users</h1>
+  <p class="text-sm text-gray-500 mb-6">Manage the accounts you have blocked.</p>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-5">
+    @if (blockedLoading) {
+      <p class="text-sm text-gray-400 text-center py-4">Loading...</p>
+    }
+    @if (!blockedLoading && blockedUsers.length === 0) {
+      <p class="text-sm text-gray-400 text-center py-4">No blocked users</p>
+    }
+    <div class="space-y-4">
+      @for (block of blockedUsers; track block.id) {
+        <div class="flex items-center justify-between pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+          <div class="flex items-center gap-3">
+            <app-avatar [url]="block.blocked.avatarUrl" [name]="block.blocked.displayName" size="sm"/>
+            <div>
+              <p class="text-sm font-semibold text-gray-900">{{ block.blocked.displayName }}</p>
+              <p class="text-xs text-gray-400">&#64;{{ block.blocked.username }}</p>
+            </div>
+          </div>
+          <button (click)="unblockUser(block.blockedId)" class="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
+            Unblock
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

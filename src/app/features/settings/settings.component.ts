@@ -6,11 +6,12 @@ import { UsersService } from '../../core/services/users.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
+import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, AvatarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, AvatarComponent, ConfirmModalComponent],
   templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {
@@ -18,6 +19,8 @@ export class SettingsComponent implements OnInit {
   passwordForm!: FormGroup;
   savingProfile = false;
   savingPassword = false;
+  showDeactivateConfirm = false;
+  isDeactivating = false;
 
   get currentUser() { return this.authService.currentUser; }
 
@@ -89,11 +92,22 @@ export class SettingsComponent implements OnInit {
   }
 
   deactivate(): void {
-    if (confirm('Deactivate your account? You can reactivate by logging in again.')) {
-      this.usersService.deactivateMe().subscribe({
-        next: () => this.authService.logout(),
-        error: () => this.toast.error('Failed to deactivate'),
-      });
-    }
+    this.showDeactivateConfirm = true;
+  }
+
+  confirmDeactivate(): void {
+    this.isDeactivating = true;
+    this.usersService.deactivateMe().subscribe({
+      next: () => {
+        this.isDeactivating = false;
+        this.showDeactivateConfirm = false;
+        this.authService.logout();
+      },
+      error: () => {
+        this.isDeactivating = false;
+        this.showDeactivateConfirm = false;
+        this.toast.error('Failed to deactivate');
+      },
+    });
   }
 }

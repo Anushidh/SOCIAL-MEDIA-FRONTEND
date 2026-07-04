@@ -31,10 +31,12 @@
       <div class="space-y-4">
         @for (post of posts; track post.id) {
           <app-post-card [post]="post"
+            [currentUserId]="currentUserId"
             (liked)="toggleLike($event)"
             (bookmarked)="removeBookmark($event)"
             (reposted)="toggleRepost($event)"
-            (reported)="reportingPost = $event"/>
+            (reported)="reportingPost = $event"
+            (deleted)="deletePost($event)"/>
         }
       </div>
 
@@ -51,6 +53,7 @@
         <app-report-modal
           [entityId]="reportingPost.id"
           entityType="post"
+          (reported)="handleReported()"
           (close)="reportingPost = null"/>
       }
     </div>

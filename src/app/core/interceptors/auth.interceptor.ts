@@ -4,7 +4,15 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 // URLs that should never trigger a refresh attempt
-const SKIP_REFRESH_URLS = ['/auth/login', '/auth/refresh', '/auth/register', '/auth/verify-email'];
+const SKIP_REFRESH_URLS = [
+  '/auth/login',
+  '/auth/refresh',
+  '/auth/register',
+  '/auth/verify-email',
+  '/auth/resend-otp',
+  '/auth/forgot-password',
+  '/auth/reset-password'
+];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);

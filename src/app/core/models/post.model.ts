@@ -18,6 +18,7 @@ export interface Post {
   isLiked?: boolean;
   isBookmarked?: boolean;
   isReposted?: boolean;
+  isReported?: boolean;
 }
 
 export interface PaginatedResponse<T> {

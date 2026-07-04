@@ -71,6 +71,10 @@ export class PostsService {
     return this.api.delete<void>(`/posts/${postId}/reposts`);
   }
 
+  getUserReposts(userId: string, page = 1, limit = 20): Observable<PaginatedResponse<Post>> {
+    return this.api.get<PaginatedResponse<Post>>(`/posts/user/${userId}/reposts?page=${page}&limit=${limit}`);
+  }
+
   reportPost(entityId: string, entityType: string, reason: string, description?: string): Observable<any> {
     return this.api.post<any>('/reports', { entityId, entityType, reason, description });
   }

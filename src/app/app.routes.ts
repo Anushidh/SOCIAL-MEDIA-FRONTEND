@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 import { MainLayoutComponent } from './layouts/main-layout.component';
 
 export const routes: Routes = [
   // ─── Auth (public) ──────────────────────────────────────────────────────────
   {
     path: 'auth',
+    canActivate: [guestGuard],
     children: [
       {
         path: 'login',
@@ -143,6 +145,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/settings/notification-preferences.component').then(
             (m) => m.NotificationPreferencesComponent,
+          ),
+      },
+      {
+        path: 'settings/blocked-users',
+        loadComponent: () =>
+          import('./features/settings/blocked-users.component').then(
+            (m) => m.BlockedUsersComponent,
           ),
       },
 

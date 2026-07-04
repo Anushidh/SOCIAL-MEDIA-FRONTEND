@@ -49,7 +49,17 @@
                 </a>
                 {{ getNotificationText(notif.type) }}
               </p>
-              <p class="text-xs text-gray-400 mt-0.5">{{ notif.createdAt | timeAgo }}</p>
+              <p class="text-xs text-gray-400 mt-0.5 mb-2">{{ notif.createdAt | timeAgo }}</p>
+              @if (notif.type === 'follow_request') {
+                <div class="flex gap-2 mt-2">
+                  <button (click)="acceptRequest(notif, $event)" class="px-3 py-1.5 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                    Accept
+                  </button>
+                  <button (click)="denyRequest(notif, $event)" class="px-3 py-1.5 text-xs font-semibold border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    Decline
+                  </button>
+                </div>
+              }
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
               @if (!notif.isRead) {

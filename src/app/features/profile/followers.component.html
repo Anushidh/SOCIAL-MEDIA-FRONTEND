@@ -2,20 +2,20 @@
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
       <!-- Tabs -->
       <div class="flex bg-white rounded-xl border border-gray-100 mb-5">
-        <a [routerLink]="['/profile', username, 'followers']"
+        <button (click)="switchTab('followers')"
            class="flex-1 py-2.5 text-sm font-medium text-center rounded-xl transition-colors"
            [class.bg-primary-600]="activeTab === 'followers'"
            [class.text-white]="activeTab === 'followers'"
            [class.text-gray-500]="activeTab !== 'followers'">
           Followers
-        </a>
-        <a [routerLink]="['/profile', username, 'following']"
+        </button>
+        <button (click)="switchTab('following')"
            class="flex-1 py-2.5 text-sm font-medium text-center rounded-xl transition-colors"
            [class.bg-primary-600]="activeTab === 'following'"
            [class.text-white]="activeTab === 'following'"
            [class.text-gray-500]="activeTab !== 'following'">
           Following
-        </a>
+        </button>
       </div>
 
       @if (loading && users.length === 0) {
@@ -51,12 +51,18 @@
             @if (user.id !== currentUserId) {
               <button (click)="toggleFollow(user)"
                       class="px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors flex-shrink-0"
-                      [class.bg-primary-600]="!user['isFollowing']"
-                      [class.text-white]="!user['isFollowing']"
-                      [class.border-transparent]="!user['isFollowing']"
-                      [class.border-gray-200]="user['isFollowing']"
-                      [class.text-gray-600]="user['isFollowing']">
-                {{ user['isFollowing'] ? 'Following' : 'Follow' }}
+                      [class.bg-primary-600]="!user['isFollowing'] && !user['isRequested']"
+                      [class.text-white]="!user['isFollowing'] && !user['isRequested']"
+                      [class.border-transparent]="!user['isFollowing'] && !user['isRequested']"
+                      [class.border-gray-200]="user['isFollowing'] || user['isRequested']"
+                      [class.text-gray-600]="user['isFollowing'] || user['isRequested']">
+                @if (user['isFollowing']) {
+                  Following
+                } @else if (user['isRequested']) {
+                  Requested
+                } @else {
+                  Follow
+                }
               </button>
             }
           </div>

@@ -21,13 +21,21 @@ import { ReportModalComponent } from '../../shared/components/report-modal/repor
 export class ProfileComponent implements OnInit {
   user: User | null = null;
   posts: Post[] = [];
+  reposts: Post[] = [];
   loading = true;
   postsLoading = false;
   isFollowing = false;
+  isRequested = false;
+  isBlocked = false;
   isOwnProfile = false;
   hasMorePosts = false;
+  hasMoreReposts = false;
   postsPage = 1;
+  repostsPage = 1;
+  activeTab: 'posts' | 'reposts' = 'posts';
   reportingPost: Post | null = null;
+
+  get currentUserId() { return this.authService.currentUser?.id; }
 
   constructor(
     private route: ActivatedRoute,
@@ -55,9 +63,18 @@ export class ProfileComponent implements OnInit {
         if (!this.isOwnProfile) {
           this.usersService.isFollowing(user.id).subscribe((res) => {
             this.isFollowing = res.isFollowing;
+            this.isRequested = res.isRequested;
+            // Only load posts if not private or if following
+            if (!user.isPrivate || this.isFollowing) {
+              this.loadPosts(user.id);
+            }
           });
+          this.usersService.isBlocked(user.id).subscribe((res) => {
+            this.isBlocked = res.isBlocked;
+          });
+        } else {
+          this.loadPosts(user.id);
         }
-        this.loadPosts(user.id);
       },
       error: () => this.loading = false,
     });
@@ -65,6 +82,7 @@ export class ProfileComponent implements OnInit {
 
   loadPosts(userId: string): void {
     this.postsLoading = true;
+    this.postsPage = 1;
     this.postsService.getUserPosts(userId, 1).subscribe({
       next: (res) => {
         this.posts = res.data;
@@ -75,14 +93,50 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  loadMorePosts(): void {
+  loadReposts(userId: string): void {
+    this.postsLoading = true;
+    this.repostsPage = 1;
+    this.postsService.getUserReposts(userId, 1).subscribe({
+      next: (res) => {
+        this.reposts = res.data;
+        this.hasMoreReposts = res.meta.hasNext;
+        this.postsLoading = false;
+      },
+      error: () => this.postsLoading = false,
+    });
+  }
+
+  switchTab(tab: 'posts' | 'reposts'): void {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
     if (!this.user) return;
+    if (tab === 'reposts' && this.reposts.length === 0) {
+      this.loadReposts(this.user.id);
+    }
+  }
+
+  loadMorePosts(): void {
+    if (!this.user || this.postsLoading) return;
     this.postsPage++;
     this.postsLoading = true;
     this.postsService.getUserPosts(this.user.id, this.postsPage).subscribe({
       next: (res) => {
         this.posts.push(...res.data);
         this.hasMorePosts = res.meta.hasNext;
+        this.postsLoading = false;
+      },
+      error: () => this.postsLoading = false,
+    });
+  }
+
+  loadMoreReposts(): void {
+    if (!this.user || this.postsLoading) return;
+    this.repostsPage++;
+    this.postsLoading = true;
+    this.postsService.getUserReposts(this.user.id, this.repostsPage).subscribe({
+      next: (res) => {
+        this.reposts.push(...res.data);
+        this.hasMoreReposts = res.meta.hasNext;
         this.postsLoading = false;
       },
       error: () => this.postsLoading = false,
@@ -96,11 +150,39 @@ export class ProfileComponent implements OnInit {
         this.isFollowing = false;
         if (this.user!.followersCount) this.user!.followersCount--;
       });
+    } else if (this.isRequested) {
+      this.usersService.unfollow(this.user.id).subscribe(() => {
+        this.isRequested = false;
+      });
     } else {
-      this.usersService.follow(this.user.id).subscribe(() => {
-        this.isFollowing = true;
-        if (this.user!.followersCount !== undefined) this.user!.followersCount++;
-        this.toast.success(`Following @${this.user!.username}`);
+      this.usersService.follow(this.user.id).subscribe((res) => {
+        if (res.requested) {
+          this.isRequested = true;
+          this.toast.success(`Follow request sent to @${this.user!.username}`);
+        } else {
+          this.isFollowing = true;
+          if (this.user!.followersCount !== undefined) this.user!.followersCount++;
+          this.toast.success(`Following @${this.user!.username}`);
+        }
+      });
+    }
+  }
+
+  toggleBlock(): void {
+    if (!this.user) return;
+    if (this.isBlocked) {
+      this.usersService.unblockUser(this.user.id).subscribe(() => {
+        this.isBlocked = false;
+        this.toast.success(`Unblocked @${this.user!.username}`);
+      });
+    } else {
+      this.usersService.blockUser(this.user.id).subscribe(() => {
+        if (this.isFollowing) {
+          this.isFollowing = false;
+          if (this.user!.followersCount) this.user!.followersCount--;
+        }
+        this.isBlocked = true;
+        this.toast.success(`Blocked @${this.user!.username}`);
       });
     }
   }
@@ -137,5 +219,24 @@ export class ProfileComponent implements OnInit {
     } else {
       this.postsService.repost(post.id).subscribe(() => { post.isReposted = true; post.repostsCount++; });
     }
+  }
+
+  handleReported(): void {
+    if (this.reportingPost) {
+      this.reportingPost.isReported = true;
+    }
+    this.reportingPost = null;
+  }
+
+  deletePost(post: Post): void {
+    this.postsService.delete(post.id).subscribe({
+      next: () => {
+        this.posts = this.posts.filter((p) => p.id !== post.id);
+        this.reposts = this.reposts.filter((p) => p.id !== post.id);
+        this.toast.success('Post deleted');
+        if (this.user) this.user.postsCount = Math.max(0, (this.user.postsCount ?? 1) - 1);
+      },
+      error: () => this.toast.error('Failed to delete post'),
+    });
   }
 }

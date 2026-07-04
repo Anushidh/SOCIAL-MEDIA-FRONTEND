@@ -24,6 +24,8 @@ export class ReportModalComponent {
   @Input() entityId!: string;
   @Input() entityType = 'post';
   @Output() close = new EventEmitter<void>();
+  /** Emits when report is successfully submitted so parent can mark isReported */
+  @Output() reported = new EventEmitter<void>();
 
   reasons = REASONS;
   selectedReason = '';
@@ -43,11 +45,19 @@ export class ReportModalComponent {
     ).subscribe({
       next: () => {
         this.toast.success('Report submitted. Thank you.');
+        this.reported.emit();
         this.close.emit();
       },
       error: (err) => {
         this.submitting = false;
-        this.toast.error(err.error?.message ?? 'Failed to submit report');
+        // 409 = already reported — treat as soft success
+        if (err.status === 409) {
+          this.toast.info('You have already reported this post.');
+          this.reported.emit();
+          this.close.emit();
+        } else {
+          this.toast.error(err.error?.message ?? 'Failed to submit report');
+        }
       },
     });
   }
