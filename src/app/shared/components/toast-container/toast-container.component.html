@@ -1,18 +1,53 @@
 <div class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
   @for (toast of toastService.toasts(); track toast.id) {
-    <div class="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium pointer-events-auto min-w-[260px] max-w-[360px] animate-slide-in"
+    <div class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-md bg-white border border-gray-100 text-sm font-medium pointer-events-auto min-w-[280px] max-w-[360px] animate-slide-in"
          [ngClass]="{
-           'bg-green-500 text-white': toast.type === 'success',
-           'bg-red-500 text-white': toast.type === 'error',
-           'bg-blue-500 text-white': toast.type === 'info',
-           'bg-yellow-500 text-white': toast.type === 'warning'
+           'border-l-4 border-l-green-500': toast.type === 'success',
+           'border-l-4 border-l-red-500':   toast.type === 'error',
+           'border-l-4 border-l-blue-500':  toast.type === 'info',
+           'border-l-4 border-l-yellow-400': toast.type === 'warning'
          }">
-      <span class="flex-1">{{ toast.message }}</span>
-      <button (click)="toastService.remove(toast.id)" class="opacity-75 hover:opacity-100">
+
+      <!-- Icon -->
+      <span class="shrink-0"
+            [ngClass]="{
+              'text-green-500': toast.type === 'success',
+              'text-red-500':   toast.type === 'error',
+              'text-blue-500':  toast.type === 'info',
+              'text-yellow-400': toast.type === 'warning'
+            }">
+        @if (toast.type === 'success') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        }
+        @if (toast.type === 'error') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        }
+        @if (toast.type === 'info') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
+          </svg>
+        }
+        @if (toast.type === 'warning') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+        }
+      </span>
+
+      <!-- Message -->
+      <span class="flex-1 text-gray-800">{{ toast.message }}</span>
+
+      <!-- Dismiss -->
+      <button (click)="toastService.remove(toast.id)" class="shrink-0 text-gray-400 hover:text-gray-600 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </button>
+
     </div>
   }
 </div>
