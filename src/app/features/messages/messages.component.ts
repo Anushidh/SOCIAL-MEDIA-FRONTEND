@@ -28,6 +28,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
   loadingMessages = false;
   messageInput = '';
   sending = false;
+  selectedFile: File | null = null;
+  filePreview: string | null = null;
   showNewChat = false;
   newChatQuery = '';
   searchedUsers: User[] = [];
@@ -199,8 +201,34 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  onFileSelected(event: any): void {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 50 * 1024 * 1024) {
+      this.toast.error('File must be less than 50MB');
+      return;
+    }
+    
+    this.selectedFile = file;
+    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => this.filePreview = e.target?.result as string;
+      reader.readAsDataURL(file);
+    } else {
+      this.filePreview = null;
+    }
+    // clear input
+    event.target.value = null;
+  }
+
+  removeFile(): void {
+    this.selectedFile = null;
+    this.filePreview = null;
+  }
+
   sendMessage(): void {
-    if (!this.messageInput.trim() || !this.activeConversation) return;
+    if ((!this.messageInput.trim() && !this.selectedFile) || !this.activeConversation || this.sending) return;
     this.sending = true;
     const content = this.messageInput;
     this.messageInput = '';
@@ -212,22 +240,40 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.typingTimeout = null;
     }
 
-    this.socketService.sendMessage(this.activeConversation.id, content).then((res) => {
-      if (res.success && res.message) {
-        this.messages.push(res.message);
-        this.sending = false;
-        setTimeout(() => this.scrollToBottom());
-        this.updateConversationList(res.message);
-      } else {
+    const finalizeSendMessage = (mediaUrl?: string, mediaType?: string) => {
+      this.socketService.sendMessage(this.activeConversation!.id, content, mediaUrl, mediaType).then((res) => {
+        if (res.success && res.message) {
+          this.messages.push(res.message);
+          this.sending = false;
+          this.removeFile();
+          setTimeout(() => this.scrollToBottom());
+          this.updateConversationList(res.message);
+        } else {
+          this.messageInput = content;
+          this.sending = false;
+          this.toast.error('Failed to send message');
+        }
+      }).catch(() => {
         this.messageInput = content;
         this.sending = false;
         this.toast.error('Failed to send message');
-      }
-    }).catch(() => {
-      this.messageInput = content;
-      this.sending = false;
-      this.toast.error('Failed to send message');
-    });
+      });
+    };
+
+    if (this.selectedFile) {
+      const formData = new FormData();
+      formData.append('file', this.selectedFile);
+      this.messagesService.uploadMedia(formData).subscribe({
+        next: (res) => finalizeSendMessage(res.mediaUrl, res.mediaType),
+        error: () => {
+          this.messageInput = content;
+          this.sending = false;
+          this.toast.error('Failed to upload media');
+        }
+      });
+    } else {
+      finalizeSendMessage();
+    }
   }
 
   onTyping(): void {

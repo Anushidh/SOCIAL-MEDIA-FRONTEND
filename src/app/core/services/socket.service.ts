@@ -75,13 +75,13 @@ export class SocketService implements OnDestroy {
     this.chatSocket?.emit('leaveConversation', { conversationId });
   }
 
-  sendMessage(conversationId: string, content: string): Promise<any> {
+  sendMessage(conversationId: string, content?: string, mediaUrl?: string, mediaType?: string): Promise<any> {
     return new Promise((resolve) => {
       if (!this.chatSocket) {
         resolve({ success: false, error: 'Not connected' });
         return;
       }
-      this.chatSocket.emit('sendMessage', { conversationId, content }, (response: any) => {
+      this.chatSocket.emit('sendMessage', { conversationId, content, mediaUrl, mediaType }, (response: any) => {
         resolve(response);
       });
     });

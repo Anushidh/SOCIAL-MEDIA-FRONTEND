@@ -2,7 +2,9 @@ import { User } from './user.model';
 
 export interface Message {
   id: string;
-  content: string;
+  content?: string;
+  mediaUrl?: string;
+  mediaType?: string;
   sender: User;
   senderId: string;
   conversationId: string;

@@ -27,6 +27,10 @@ export class MessagesService {
     return this.api.post<Message>('/messages', { conversationId, content });
   }
 
+  uploadMedia(formData: FormData): Observable<{ mediaUrl: string; mediaType: string }> {
+    return this.api.post<{ mediaUrl: string; mediaType: string }>('/messages/media', formData);
+  }
+
   markAsRead(conversationId: string): Observable<void> {
     return this.api.patch<void>(`/messages/conversations/${conversationId}/read`, {});
   }
