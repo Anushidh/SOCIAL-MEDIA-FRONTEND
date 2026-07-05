@@ -69,9 +69,9 @@ export class SettingsComponent implements OnInit {
         if (user) {
           this.authService.updateCurrentUser({ ...user, avatarUrl: res.avatarUrl });
         }
-        this.toast.success('Avatar updated!');
+        this.toast.success('Profile picture updated!');
       },
-      error: () => this.toast.error('Failed to upload avatar'),
+      error: () => this.toast.error('Failed to upload profile picture'),
     });
   }
 
