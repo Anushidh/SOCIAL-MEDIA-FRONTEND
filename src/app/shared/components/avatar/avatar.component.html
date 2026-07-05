@@ -1,13 +1,13 @@
 @if (url) {
   <img
-    [ngSrc]="url"
+    [src]="url"
     [alt]="safeName"
-    [width]="pixelSize"
-    [height]="pixelSize"
     [class]="sizeClass + ' rounded-full object-cover flex-shrink-0'">
 } @else {
-  <div [class]="sizeClass + ' rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0'">
-    <span [class]="textClass + ' font-bold text-primary-600 uppercase'">
+  <div [class]="sizeClass + ' rounded-full flex items-center justify-center flex-shrink-0'"
+       style="background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+    <span [class]="textClass + ' font-semibold uppercase'"
+          style="color: var(--color-accent);">
       {{ safeName[0] || '?' }}
     </span>
   </div>

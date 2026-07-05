@@ -3,17 +3,20 @@
 
       <!-- Search input -->
       <div class="relative mb-5">
-        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+             style="color: var(--color-text-muted);"
              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input [(ngModel)]="query" (ngModelChange)="onSearch($event)" type="text"
                placeholder="Search people, posts, or #hashtags…"
-               class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
+               class="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-colors search-input focus:outline-none"
+               style="background-color: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-body);">
         @if (query) {
           <button (click)="clearSearch()"
-                  class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  class="absolute right-3.5 top-1/2 -translate-y-1/2 transition-opacity hover:opacity-60"
+                  style="color: var(--color-text-muted);">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -23,13 +26,13 @@
 
       <!-- Tabs -->
       @if (query) {
-        <div class="flex bg-white rounded-xl border border-gray-100 mb-4">
+        <div class="flex rounded-xl mb-4 p-0.5"
+             style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
           @for (tab of tabs; track tab.key) {
             <button (click)="activeTab = tab.key"
-                    class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
-                    [class.bg-primary-600]="activeTab === tab.key"
-                    [class.text-white]="activeTab === tab.key"
-                    [class.text-gray-500]="activeTab !== tab.key">
+                    class="flex-1 py-2 text-sm font-medium rounded-lg transition-colors tab-btn"
+                    [style.background-color]="activeTab === tab.key ? 'var(--color-accent)' : 'transparent'"
+                    [style.color]="activeTab === tab.key ? '#fff' : 'var(--color-text-muted)'">
               {{ tab.label }}
             </button>
           }
@@ -39,23 +42,31 @@
       <!-- Loading -->
       @if (loading) {
         <div class="flex justify-center py-8">
-          <div class="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <svg class="w-5 h-5 animate-spin" style="color: var(--color-accent);" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
         </div>
       }
 
-      <!-- Users results -->
+      <!-- User results -->
       @if (!loading && activeTab === 'users') {
         @if (users.length > 0) {
-          <div class="space-y-2">
+          <div class="space-y-1.5">
             @for (user of users; track user.id) {
               <a [routerLink]="['/profile', user.username]"
-                 class="flex items-center gap-3 bg-white rounded-xl border border-gray-100 p-3.5 hover:border-gray-200 transition-colors">
+                 class="flex items-center gap-3 rounded-xl p-3.5 transition-colors search-result-row"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
                 <app-avatar [url]="user.avatarUrl" [name]="user.displayName" size="md"/>
                 <div class="flex-1 min-w-0">
-                  <p class="font-semibold text-gray-900 text-sm truncate">{{ user.displayName }}</p>
-                  <p class="text-xs text-gray-400 truncate">&#64;{{ user.username }}</p>
+                  <p class="font-semibold text-sm truncate" style="color: var(--color-text-primary);">
+                    {{ user.displayName }}
+                  </p>
+                  <p class="text-xs truncate" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+                    &#64;{{ user.username }}
+                  </p>
                   @if (user.bio) {
-                    <p class="text-xs text-gray-500 mt-0.5 truncate">{{ user.bio }}</p>
+                    <p class="text-xs mt-0.5 truncate" style="color: var(--color-text-secondary);">{{ user.bio }}</p>
                   }
                 </div>
               </a>
@@ -63,15 +74,17 @@
           </div>
         } @else if (query) {
           <div class="text-center py-12">
-            <p class="text-gray-400 font-medium">No people found for "{{ query }}"</p>
+            <p style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+              No people found for "{{ query }}"
+            </p>
           </div>
         }
       }
 
-      <!-- Posts results -->
+      <!-- Post results -->
       @if (!loading && activeTab === 'posts') {
         @if (posts.length > 0) {
-          <div class="space-y-4">
+          <div class="space-y-3">
             @for (post of posts; track post.id) {
               <app-post-card [post]="post"
                 (liked)="toggleLike($event)"
@@ -82,7 +95,9 @@
           </div>
         } @else if (query) {
           <div class="text-center py-12">
-            <p class="text-gray-400 font-medium">No posts found for "{{ query }}"</p>
+            <p style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+              No posts found for "{{ query }}"
+            </p>
           </div>
         }
       }
@@ -90,16 +105,17 @@
       <!-- Initial empty state -->
       @if (!query) {
         <div class="text-center py-16">
-          <svg class="w-12 h-12 mx-auto text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <svg class="w-10 h-10 mx-auto mb-3" style="color: var(--color-border);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
-          <p class="text-gray-400 font-medium">Search for people and posts</p>
-          <p class="text-xs text-gray-300 mt-1">Use #hashtag to search by topic</p>
+          <p class="font-medium" style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+            Search for people and posts
+          </p>
+          <p class="text-xs mt-1" style="color: var(--color-text-muted);">Use #hashtag to search by topic</p>
         </div>
       }
 
-      <!-- Report modal -->
       @if (reportingPost) {
         <app-report-modal
           [entityId]="reportingPost.id"
@@ -107,4 +123,3 @@
           (close)="reportingPost = null"/>
       }
     </div>
-  

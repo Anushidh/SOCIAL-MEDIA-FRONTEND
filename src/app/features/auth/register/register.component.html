@@ -1,19 +1,30 @@
-<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+
+<div class="min-h-screen flex items-center justify-center px-4 py-10"
+     style="background-color: var(--color-background);">
   <div class="w-full max-w-md">
+
+    <!-- Header -->
     <div class="text-center mb-8">
-      <div class="w-12 h-12 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <span class="text-white text-2xl font-bold">S</span>
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-5"
+           style="background-color: var(--color-accent);">
+        <span class="text-white font-semibold text-sm" style="font-family: var(--font-heading);">S</span>
       </div>
-      <h1 class="text-2xl font-bold text-gray-900">Create your account</h1>
-      <p class="text-gray-500 mt-1">Join our community today</p>
+      <h1 style="font-family: var(--font-heading); font-size: clamp(1.6rem, 4vw, 2rem); font-weight: 400; letter-spacing: -0.02em; color: var(--color-text-primary);">
+        Create your account
+      </h1>
+      <p class="mt-1 text-sm" style="color: var(--color-text-muted);">Join our community today</p>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-      <!-- OAuth buttons -->
-      <div class="space-y-3 mb-5">
+    <!-- Card -->
+    <div class="rounded-2xl p-8"
+         style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+
+      <!-- OAuth -->
+      <div class="space-y-2.5 mb-5">
         <a [href]="googleAuthUrl"
-           class="flex items-center justify-center gap-3 w-full py-2.5 px-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm text-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
+           class="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-lg text-sm font-medium transition-colors oauth-btn"
+           style="border: 1px solid var(--color-border); color: var(--color-text-primary);">
+          <svg style="width:18px;height:18px;" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -22,71 +33,95 @@
           Continue with Google
         </a>
         <a [href]="facebookAuthUrl"
-           class="flex items-center justify-center gap-3 w-full py-2.5 px-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm text-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2">
+           class="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-lg text-sm font-medium transition-colors oauth-btn"
+           style="border: 1px solid var(--color-border); color: var(--color-text-primary);">
+          <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="#1877F2">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
           </svg>
           Continue with Facebook
         </a>
       </div>
 
+      <!-- Divider -->
       <div class="flex items-center gap-3 mb-5">
-        <div class="flex-1 h-px bg-gray-200"></div>
-        <span class="text-xs text-gray-400 font-medium">OR</span>
-        <div class="flex-1 h-px bg-gray-200"></div>
+        <div class="flex-1 h-px" style="background-color: var(--color-border);"></div>
+        <span class="text-xs" style="color: var(--color-text-muted); font-family: var(--font-mono);">OR</span>
+        <div class="flex-1 h-px" style="background-color: var(--color-border);"></div>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="space-y-4">
+
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+            <label class="block text-xs font-medium mb-1.5"
+                   style="color: var(--color-text-secondary); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase;">
+              Username
+            </label>
             <input formControlName="username" type="text" placeholder="john_doe"
-                   class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                   [class.border-red-300]="submitted && f['username'].errors">
+                   class="w-full px-4 py-2.5 rounded-lg text-sm transition-colors auth-input focus:outline-none"
+                   [class.border-error]="submitted && f['username'].errors"
+                   style="border: 1px solid var(--color-border); background-color: var(--color-background); color: var(--color-text-primary); font-family: var(--font-body);">
             @if (submitted && f['username'].errors?.['required']) {
-              <p class="text-xs text-red-500 mt-1">Username is required</p>
+              <p class="text-xs mt-1" style="color: var(--color-error);">Username is required</p>
             }
             @if (submitted && f['username'].errors?.['minlength']) {
-              <p class="text-xs text-red-500 mt-1">At least 3 characters</p>
+              <p class="text-xs mt-1" style="color: var(--color-error);">At least 3 characters</p>
             }
           </div>
+
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Display Name</label>
+            <label class="block text-xs font-medium mb-1.5"
+                   style="color: var(--color-text-secondary); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase;">
+              Display Name
+            </label>
             <input formControlName="displayName" type="text" placeholder="John Doe"
-                   class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
+                   class="w-full px-4 py-2.5 rounded-lg text-sm transition-colors auth-input focus:outline-none"
+                   style="border: 1px solid var(--color-border); background-color: var(--color-background); color: var(--color-text-primary); font-family: var(--font-body);">
           </div>
+
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <label class="block text-xs font-medium mb-1.5"
+                   style="color: var(--color-text-secondary); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase;">
+              Email
+            </label>
             <input formControlName="email" type="email" placeholder="you@example.com"
-                   class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                   [class.border-red-300]="submitted && f['email'].errors">
+                   class="w-full px-4 py-2.5 rounded-lg text-sm transition-colors auth-input focus:outline-none"
+                   [class.border-error]="submitted && f['email'].errors"
+                   style="border: 1px solid var(--color-border); background-color: var(--color-background); color: var(--color-text-primary); font-family: var(--font-body);">
             @if (submitted && f['email'].errors?.['required']) {
-              <p class="text-xs text-red-500 mt-1">Email is required</p>
+              <p class="text-xs mt-1" style="color: var(--color-error);">Email is required</p>
             }
             @if (submitted && f['email'].errors?.['email']) {
-              <p class="text-xs text-red-500 mt-1">Enter a valid email</p>
+              <p class="text-xs mt-1" style="color: var(--color-error);">Enter a valid email</p>
             }
           </div>
+
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+            <label class="block text-xs font-medium mb-1.5"
+                   style="color: var(--color-text-secondary); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase;">
+              Password
+            </label>
             <input formControlName="password" type="password" placeholder="Min 8 characters"
-                   class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                   [class.border-red-300]="submitted && f['password'].errors">
+                   class="w-full px-4 py-2.5 rounded-lg text-sm transition-colors auth-input focus:outline-none"
+                   [class.border-error]="submitted && f['password'].errors"
+                   style="border: 1px solid var(--color-border); background-color: var(--color-background); color: var(--color-text-primary); font-family: var(--font-body);">
             @if (submitted && f['password'].errors?.['minlength']) {
-              <p class="text-xs text-red-500 mt-1">At least 8 characters required</p>
+              <p class="text-xs mt-1" style="color: var(--color-error);">At least 8 characters required</p>
             }
           </div>
+
           <button type="submit" [disabled]="loading"
-                  class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-lg transition-colors">
+                  class="w-full py-2.5 px-4 text-sm font-semibold rounded-lg transition-opacity disabled:opacity-40"
+                  style="background-color: var(--color-accent); color: #fff; border: 1px solid var(--color-accent);">
             {{ loading ? 'Creating account…' : 'Create account' }}
           </button>
         </div>
       </form>
     </div>
 
-    <p class="text-center text-sm text-gray-500 mt-6">
+    <p class="text-center text-sm mt-6" style="color: var(--color-text-muted);">
       Already have an account?
-      <a routerLink="/auth/login" class="text-primary-600 font-medium hover:text-primary-700">Sign in</a>
+      <a routerLink="/auth/login" class="font-medium ml-1 auth-link" style="color: var(--color-accent);">Sign in</a>
     </p>
   </div>
 </div>

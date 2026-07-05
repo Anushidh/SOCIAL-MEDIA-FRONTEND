@@ -1,59 +1,75 @@
 
-    <div class="flex h-screen bg-gray-50 overflow-hidden">
-      <!-- Sidebar (desktop) -->
-      <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 fixed h-full z-10">
-        <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
-          <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center">
-            <span class="text-white font-bold text-sm">S</span>
+    <div class="flex h-screen overflow-hidden" style="background-color: var(--color-background);">
+
+      <!-- ── Sidebar (desktop) ─────────────────────────────────────────────── -->
+      <aside class="hidden md:flex flex-col w-60 fixed h-full z-10"
+             style="background-color: var(--color-surface); border-right: 1px solid var(--color-border);">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-2.5 px-6 py-5"
+             style="border-bottom: 1px solid var(--color-border);">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center"
+               style="background-color: var(--color-accent);">
+            <span class="text-white font-semibold text-xs">S</span>
           </div>
-          <span class="font-bold text-xl text-gray-900">SocialApp</span>
+          <span style="font-family: var(--font-heading); font-size: 1.1rem; letter-spacing: -0.01em; color: var(--color-text-primary);">
+            SocialApp
+          </span>
         </div>
 
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <a routerLink="/feed" routerLinkActive="bg-primary-50 text-primary-600"
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        <!-- Nav links -->
+        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+
+          <a routerLink="/feed" routerLinkActive="nav-link-active"
+             class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+             style="color: var(--color-text-secondary); font-size: 0.875rem;">
+            <svg class="w-4.5 h-4.5 flex-shrink-0" style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
             <span class="font-medium">Home</span>
           </a>
 
-          <a routerLink="/search" routerLinkActive="bg-primary-50 text-primary-600"
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <a routerLink="/search" routerLinkActive="nav-link-active"
+             class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+             style="color: var(--color-text-secondary); font-size: 0.875rem;">
+            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <span class="font-medium">Search</span>
           </a>
 
-          <a routerLink="/notifications" routerLinkActive="bg-primary-50 text-primary-600"
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors relative">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <a routerLink="/notifications" routerLinkActive="nav-link-active"
+             class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors relative"
+             style="color: var(--color-text-secondary); font-size: 0.875rem;">
+            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
             <span class="font-medium">Notifications</span>
             @if ((notifUnread$ | async) ?? 0; as count) {
               @if (count > 0) {
-                <span class="ml-auto bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                <span class="ml-auto text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5 min-w-[18px] text-center"
+                      style="background-color: var(--color-error); font-family: var(--font-mono);">
                   {{ count > 99 ? '99+' : count }}
                 </span>
               }
             }
           </a>
 
-          <a routerLink="/messages" routerLinkActive="bg-primary-50 text-primary-600"
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors relative">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <a routerLink="/messages" routerLinkActive="nav-link-active"
+             class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors relative"
+             style="color: var(--color-text-secondary); font-size: 0.875rem;">
+            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
             <span class="font-medium">Messages</span>
             @if ((msgUnread$ | async) ?? 0; as count) {
               @if (count > 0) {
-                <span class="ml-auto bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                <span class="ml-auto text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5 min-w-[18px] text-center"
+                      style="background-color: var(--color-error); font-family: var(--font-mono);">
                   {{ count > 99 ? '99+' : count }}
                 </span>
               }
@@ -62,14 +78,16 @@
 
           @if (currentUser) {
             <a [routerLink]="['/profile', currentUser.username]"
-               routerLinkActive="bg-primary-50 text-primary-600"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+               routerLinkActive="nav-link-active"
+               class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+               style="color: var(--color-text-secondary); font-size: 0.875rem;">
               @if (currentUser.avatarUrl) {
                 <img [src]="currentUser.avatarUrl" alt="Avatar"
-                     class="w-5 h-5 rounded-full object-cover">
+                     class="rounded-full object-cover flex-shrink-0" style="width:18px;height:18px;">
               } @else {
-                <div class="w-5 h-5 rounded-full bg-primary-200 flex items-center justify-center">
-                  <span class="text-primary-700 text-xs font-bold">
+                <div class="rounded-full flex items-center justify-center flex-shrink-0"
+                     style="width:18px;height:18px;background-color:color-mix(in srgb,var(--color-accent) 12%,transparent);">
+                  <span style="font-size:10px;font-weight:600;color:var(--color-accent);">
                     {{ currentUser.displayName?.[0] | uppercase }}
                   </span>
                 </div>
@@ -77,42 +95,47 @@
               <span class="font-medium">Profile</span>
             </a>
 
-          <a routerLink="/bookmarks" routerLinkActive="bg-primary-50 text-primary-600"
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-            </svg>
-            <span class="font-medium">Bookmarks</span>
-          </a>
+            <a routerLink="/bookmarks" routerLinkActive="nav-link-active"
+               class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+               style="color: var(--color-text-secondary); font-size: 0.875rem;">
+              <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+              </svg>
+              <span class="font-medium">Bookmarks</span>
+            </a>
 
-          <a routerLink="/stories" routerLinkActive="bg-primary-50 text-primary-600"
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
-            <span class="font-medium">Stories</span>
-          </a>
+            <a routerLink="/stories" routerLinkActive="nav-link-active"
+               class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+               style="color: var(--color-text-secondary); font-size: 0.875rem;">
+              <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                  d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              <span class="font-medium">Stories</span>
+            </a>
           }
 
-          <a routerLink="/settings" routerLinkActive="bg-primary-50 text-primary-600"
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <a routerLink="/settings" routerLinkActive="nav-link-active"
+             class="nav-link-item flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+             style="color: var(--color-text-secondary); font-size: 0.875rem;">
+            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
             <span class="font-medium">Settings</span>
           </a>
         </nav>
 
-        <div class="px-3 py-4 border-t border-gray-100">
+        <!-- Sign out -->
+        <div class="px-3 py-4" style="border-top: 1px solid var(--color-border);">
           <button (click)="showLogoutConfirm = true"
-                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 w-full transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full transition-colors nav-logout-btn"
+                  style="color: var(--color-text-muted); font-size: 0.875rem;">
+            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
             <span class="font-medium">Sign out</span>
@@ -120,16 +143,14 @@
         </div>
       </aside>
 
-      <!-- Main content -->
-      <main class="flex-1 md:ml-64 overflow-y-auto">
+      <!-- ── Main content ───────────────────────────────────────────────────── -->
+      <main class="flex-1 md:ml-60 overflow-y-auto">
         <div class="max-w-6xl mx-auto px-4 py-0 flex gap-6"
              [class.max-w-full]="isFullWidthRoute"
              [class.px-0]="isFullWidthRoute">
-          <!-- Center feed -->
           <div class="flex-1 min-w-0">
             <router-outlet/>
           </div>
-          <!-- Right sidebar — only on wider screens, not on messages -->
           @if (!isFullWidthRoute) {
             <aside class="hidden xl:block w-72 flex-shrink-0 py-6">
               <app-right-sidebar/>
@@ -138,94 +159,117 @@
         </div>
       </main>
 
-      <!-- Bottom nav (mobile) -->
-      <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+      <!-- ── Mobile bottom nav ──────────────────────────────────────────────── -->
+      <nav class="md:hidden fixed bottom-0 left-0 right-0 z-10"
+           style="background-color: var(--color-surface); border-top: 1px solid var(--color-border);">
         <div class="flex justify-around items-center h-14">
-          <a routerLink="/feed" routerLinkActive="text-primary-600"
-             class="flex flex-col items-center justify-center text-gray-500 flex-1 h-full">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+
+          <a routerLink="/feed" routerLinkActive="mob-active"
+             class="mob-nav flex flex-col items-center justify-center flex-1 h-full"
+             style="color: var(--color-text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
           </a>
-          <a routerLink="/search" routerLinkActive="text-primary-600"
-             class="flex flex-col items-center justify-center text-gray-500 flex-1 h-full">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+
+          <a routerLink="/search" routerLinkActive="mob-active"
+             class="mob-nav flex flex-col items-center justify-center flex-1 h-full"
+             style="color: var(--color-text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
           </a>
-          <a routerLink="/notifications" routerLinkActive="text-primary-600"
-             class="flex flex-col items-center justify-center text-gray-500 flex-1 h-full relative">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+
+          <a routerLink="/notifications" routerLinkActive="mob-active"
+             class="mob-nav flex flex-col items-center justify-center flex-1 h-full relative"
+             style="color: var(--color-text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
             @if ((notifUnread$ | async) ?? 0; as count) {
               @if (count > 0) {
-                <span class="absolute top-1 right-4 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span class="absolute top-1.5 right-4 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center"
+                      style="background-color: var(--color-error);">
                   {{ count > 9 ? '9+' : count }}
                 </span>
               }
             }
           </a>
-          <a routerLink="/messages" routerLinkActive="text-primary-600"
-             class="flex flex-col items-center justify-center text-gray-500 flex-1 h-full">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+
+          <a routerLink="/messages" routerLinkActive="mob-active"
+             class="mob-nav flex flex-col items-center justify-center flex-1 h-full"
+             style="color: var(--color-text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
           </a>
-          <!-- More overflow button — gives access to Settings, Bookmarks, and Profile -->
+
+          <!-- More menu -->
           <div class="relative flex-1 h-full flex items-center justify-center">
             <button (click)="showMoreMenu = !showMoreMenu"
-                    class="flex flex-col items-center justify-center text-gray-500 w-full h-full"
-                    [class.text-primary-600]="showMoreMenu">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    class="mob-nav flex flex-col items-center justify-center w-full h-full"
+                    style="color: var(--color-text-muted);"
+                    [style.color]="showMoreMenu ? 'var(--color-accent)' : ''">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                   d="M4 6h16M4 12h16M4 18h16"/>
               </svg>
             </button>
-            <!-- More menu popup -->
             @if (showMoreMenu) {
-              <div class="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-20">
+              <div class="absolute bottom-full right-0 mb-2 w-48 rounded-xl overflow-hidden z-20"
+                   style="background-color: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 8px 32px rgba(0,0,0,0.10);">
                 @if (currentUser) {
                   <a [routerLink]="['/profile', currentUser.username]"
                      (click)="showMoreMenu = false"
-                     class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                     class="flex items-center gap-3 px-4 py-3 transition-colors mob-more-item"
+                     style="font-size: 0.875rem; color: var(--color-text-primary);">
+                    <svg class="w-4 h-4" style="color: var(--color-text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                     Profile
                   </a>
                 }
-                <a routerLink="/bookmarks"
-                   (click)="showMoreMenu = false"
-                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                <a routerLink="/bookmarks" (click)="showMoreMenu = false"
+                   class="flex items-center gap-3 px-4 py-3 transition-colors mob-more-item"
+                   style="font-size: 0.875rem; color: var(--color-text-primary);">
+                  <svg class="w-4 h-4" style="color: var(--color-text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                       d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                   </svg>
                   Bookmarks
                 </a>
-                <a routerLink="/settings"
-                   (click)="showMoreMenu = false"
-                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                <a routerLink="/settings" (click)="showMoreMenu = false"
+                   class="flex items-center gap-3 px-4 py-3 transition-colors mob-more-item"
+                   style="font-size: 0.875rem; color: var(--color-text-primary); border-bottom: 1px solid var(--color-border);">
+                  <svg class="w-4 h-4" style="color: var(--color-text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                       d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                       d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
                   Settings
                 </a>
+                <button (click)="showMoreMenu = false; showLogoutConfirm = true"
+                        class="flex items-center gap-3 px-4 py-3 w-full text-left transition-colors mob-more-logout"
+                        style="font-size: 0.875rem; color: var(--color-error);">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                  </svg>
+                  Sign out
+                </button>
               </div>
-              <!-- Backdrop to close menu on outside click -->
               <div class="fixed inset-0 z-10" (click)="showMoreMenu = false"></div>
             }
           </div>
         </div>
       </nav>
+
     </div>
 
     @if (showLogoutConfirm) {
@@ -236,4 +280,6 @@
         (confirmed)="logout()"
         (cancelled)="showLogoutConfirm = false"/>
     }
-  
+
+
+

@@ -2,17 +2,205 @@
 @tailwind components;
 @tailwind utilities;
 
-// Global styles
+/* ─── Google Fonts ──────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Design tokens (mirrored from portfolio globals.css) ───────────────────── */
 :root {
-  --font-primary: 'Inter', system-ui, sans-serif;
+  --color-background:     #FAFAF7;
+  --color-surface:        #FFFFFF;
+  --color-text-primary:   #242424;
+  --color-text-secondary: #6B6B6B;
+  --color-text-muted:     #9A9A9A;
+  --color-border:         #E7E5E4;
+  --color-accent:         #0F766E;
+  --color-accent-hover:   #115E59;
+  --color-success:        #15803D;
+  --color-error:          #B91C1C;
+
+  --font-heading: 'Instrument Serif', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ─── Base reset ────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: var(--font-primary);
-  @apply bg-gray-50 text-gray-900;
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-// Utility classes
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+code, pre, kbd {
+  font-family: var(--font-mono);
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* ─── Text selection ────────────────────────────────────────────────────────── */
+::selection {
+  background-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+/* ─── Animated underline (portfolio pattern) ────────────────────────────────── */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 0;
+    height: 1px;
+    background-color: currentColor;
+    transition: width 0.25s ease;
+  }
+
+  &:hover::after { width: 100%; }
+}
+
+/* ─── Section eyebrow label ─────────────────────────────────────────────────── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+/* ─── Utility container ─────────────────────────────────────────────────────── */
 .container-app {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
+
+/* ─── Component hover/state styles (extracted from templates) ────────────────── */
+
+/* Auth pages */
+.auth-input:focus { border-color: var(--color-accent) !important; background-color: var(--color-surface) !important; }
+.auth-input::placeholder { color: var(--color-text-muted); }
+.border-error { border-color: var(--color-error) !important; }
+.auth-link:hover { opacity: 0.75; }
+.oauth-btn:hover { background-color: var(--color-background); }
+
+/* Post card */
+.post-card:hover { border-color: color-mix(in srgb, var(--color-accent) 25%, var(--color-border)); }
+.post-author-name { transition: color 0.15s ease; }
+.post-author-name:hover { color: var(--color-accent) !important; }
+.post-action-btn:hover { opacity: 0.7; }
+.post-menu-btn:hover { background-color: var(--color-background); color: var(--color-text-primary) !important; }
+.post-delete-btn:hover { background-color: color-mix(in srgb, var(--color-error) 6%, transparent); }
+.post-hashtag:hover { color: var(--color-accent-hover) !important; }
+
+/* Feed */
+.composer-trigger:hover { border-color: var(--color-accent) !important; color: var(--color-text-secondary) !important; }
+.composer-close:hover { border-color: var(--color-accent); color: var(--color-accent) !important; }
+.tab-btn:hover { opacity: 0.85; }
+
+/* Right sidebar */
+.sidebar-search:focus { border-color: var(--color-accent) !important; }
+.sidebar-search::placeholder { color: var(--color-text-muted); }
+.sidebar-row:hover .sidebar-tag-name { color: var(--color-accent) !important; }
+.sidebar-row:hover .sidebar-chevron { color: var(--color-accent) !important; }
+.sidebar-more-link:hover { opacity: 0.7; }
+.follow-btn:hover { opacity: 0.85; }
+.footer-link:hover { color: var(--color-text-primary); }
+
+/* Confirm modal */
+.modal-cancel-btn:hover { background-color: var(--color-background); }
+
+/* Report modal */
+.report-close-btn:hover { border-color: var(--color-accent); color: var(--color-accent) !important; }
+.report-reason-row:hover { background-color: var(--color-background); }
+.report-textarea:focus { border-color: var(--color-accent) !important; background-color: var(--color-surface) !important; }
+.report-textarea::placeholder { color: var(--color-text-muted); }
+
+/* Notifications */
+.notif-row:hover { border-color: color-mix(in srgb, var(--color-accent) 25%, var(--color-border)) !important; }
+.notif-actor-link:hover { color: var(--color-accent) !important; }
+.notif-decline-btn:hover { background-color: var(--color-background); }
+.notif-delete-btn:hover { color: var(--color-error) !important; }
+
+/* Search */
+.search-input:focus { border-color: var(--color-accent) !important; }
+.search-input::placeholder { color: var(--color-text-muted); }
+.search-result-row:hover { border-color: color-mix(in srgb, var(--color-accent) 25%, var(--color-border)); }
+
+/* Profile */
+.profile-outline-btn:hover { background-color: var(--color-background); }
+
+/* Settings */
+.settings-input:focus { border-color: var(--color-accent) !important; background-color: var(--color-surface) !important; }
+.settings-input::placeholder { color: var(--color-text-muted); }
+.settings-nav-row:hover { background-color: var(--color-background); }
+.danger-btn:hover { background-color: color-mix(in srgb, var(--color-error) 6%, transparent); }
+.unblock-btn:hover { background-color: var(--color-background); }
+
+/* Post detail */
+.back-link:hover { color: var(--color-text-primary) !important; }
+.detail-author-link:hover { color: var(--color-accent) !important; }
+.reply-input:focus { border-color: var(--color-accent) !important; }
+.reply-input::placeholder { color: var(--color-text-muted); }
+.comment-delete-btn:hover { color: var(--color-error) !important; }
+
+/* Create post */
+.create-textarea:focus { border-color: var(--color-accent) !important; background-color: var(--color-surface) !important; }
+.create-textarea::placeholder { color: var(--color-text-muted); }
+.error-border { border-color: var(--color-error) !important; }
+
+/* Messages */
+.msg-compose-btn:hover { border-color: var(--color-accent); color: var(--color-accent) !important; }
+.msg-search:focus { border-color: var(--color-accent) !important; }
+.msg-search::placeholder { color: var(--color-text-muted); }
+.msg-user-row:hover { background-color: var(--color-background); }
+.conv-row:hover { background-color: color-mix(in srgb, var(--color-accent) 5%, transparent); }
+.msg-input:focus { border-color: var(--color-accent) !important; }
+.msg-input::placeholder { color: var(--color-text-muted); }
+
+/* Stories */
+.story-close-btn:hover { border-color: var(--color-accent); color: var(--color-accent) !important; }
+.story-upload-area:hover { border-color: var(--color-accent); }
+.story-input:focus { border-color: var(--color-accent) !important; }
+.story-input::placeholder { color: var(--color-text-muted); }
+.story-thumb { transition: opacity 0.15s ease; }
+.story-thumb:hover { opacity: 0.85; }
+
+/* Nav (main layout) */
+.nav-link-item:hover {
+  background-color: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  color: var(--color-text-primary) !important;
+}
+.nav-link-active {
+  background-color: color-mix(in srgb, var(--color-accent) 10%, transparent) !important;
+  color: var(--color-accent) !important;
+}
+.nav-logout-btn:hover {
+  background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
+  color: var(--color-error) !important;
+}
+.mob-nav:hover, .mob-active { color: var(--color-accent) !important; }
+.mob-more-item:hover { background-color: var(--color-background); }
+.mob-more-logout:hover { background-color: color-mix(in srgb, var(--color-error) 6%, transparent); }

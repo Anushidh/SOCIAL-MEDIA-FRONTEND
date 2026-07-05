@@ -1,39 +1,52 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
-      <div class="flex items-center gap-2 mb-6">
-        <a routerLink="/settings" class="text-gray-400 hover:text-gray-600">
+
+      <div class="flex items-center gap-3 mb-6">
+        <a routerLink="/settings" class="transition-opacity hover:opacity-60" style="color: var(--color-text-muted);">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 19l-7-7 7-7"/>
           </svg>
         </a>
-        <h1 class="text-xl font-bold text-gray-900">Notification Preferences</h1>
+        <h1 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 400; letter-spacing: -0.02em; color: var(--color-text-primary);">
+          Notification Preferences
+        </h1>
       </div>
 
       @if (loading) {
-        <div class="bg-white rounded-2xl border border-gray-100 p-5 space-y-5 animate-pulse">
+        <div class="rounded-2xl p-5 space-y-5 animate-pulse"
+             style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
           @for (i of [1,2,3,4,5]; track i) {
             <div class="flex items-center justify-between">
-              <div class="h-4 bg-gray-200 rounded w-32"></div>
-              <div class="w-10 h-5 bg-gray-200 rounded-full"></div>
+              <div class="h-4 rounded w-32" style="background-color: var(--color-border);"></div>
+              <div class="w-10 h-5 rounded-full" style="background-color: var(--color-border);"></div>
             </div>
           }
         </div>
       }
 
       @if (!loading && prefs) {
-        <div class="bg-white rounded-2xl border border-gray-100 p-5">
-          <p class="text-sm text-gray-500 mb-5">Choose which notifications you want to receive.</p>
-          <div class="space-y-5 divide-y divide-gray-50">
+        <div class="rounded-2xl p-5"
+             style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+          <p class="text-sm mb-5" style="color: var(--color-text-muted);">
+            Choose which notifications you want to receive.
+          </p>
+          <div class="space-y-0">
             @for (item of prefItems; track item.key) {
-              <div class="flex items-center justify-between pt-4 first:pt-0">
+              <div class="flex items-center justify-between py-4"
+                   [style.border-top]="!$first ? '1px solid var(--color-border)' : 'none'">
                 <div>
-                  <p class="text-sm font-medium text-gray-900">{{ item.label }}</p>
-                  <p class="text-xs text-gray-400">{{ item.description }}</p>
+                  <p class="text-sm font-medium" style="color: var(--color-text-primary);">{{ item.label }}</p>
+                  <p class="text-xs mt-0.5" style="color: var(--color-text-muted);">{{ item.description }}</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" [checked]="prefs[item.key]"
                          (change)="toggle(item.key)" class="sr-only peer">
-                  <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-primary-600 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
+                  <div class="w-10 h-5 rounded-full transition-colors"
+                       style="background-color: var(--color-border);"
+                       [style.background-color]="prefs[item.key] ? 'var(--color-accent)' : 'var(--color-border)'">
+                    <div class="absolute top-[2px] start-[2px] bg-white rounded-full h-4 w-4 transition-transform"
+                         [style.transform]="prefs[item.key] ? 'translateX(1.25rem)' : 'none'"></div>
+                  </div>
                 </label>
               </div>
             }
@@ -41,4 +54,3 @@
         </div>
       }
     </div>
-  

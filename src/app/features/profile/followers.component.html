@@ -1,68 +1,68 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+
       <!-- Tabs -->
-      <div class="flex bg-white rounded-xl border border-gray-100 mb-5">
+      <div class="flex rounded-xl mb-5 p-0.5"
+           style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
         <button (click)="switchTab('followers')"
-           class="flex-1 py-2.5 text-sm font-medium text-center rounded-xl transition-colors"
-           [class.bg-primary-600]="activeTab === 'followers'"
-           [class.text-white]="activeTab === 'followers'"
-           [class.text-gray-500]="activeTab !== 'followers'">
+                class="flex-1 py-2 text-sm font-medium text-center rounded-lg transition-colors tab-btn"
+                [style.background-color]="activeTab === 'followers' ? 'var(--color-accent)' : 'transparent'"
+                [style.color]="activeTab === 'followers' ? '#fff' : 'var(--color-text-muted)'">
           Followers
         </button>
         <button (click)="switchTab('following')"
-           class="flex-1 py-2.5 text-sm font-medium text-center rounded-xl transition-colors"
-           [class.bg-primary-600]="activeTab === 'following'"
-           [class.text-white]="activeTab === 'following'"
-           [class.text-gray-500]="activeTab !== 'following'">
+                class="flex-1 py-2 text-sm font-medium text-center rounded-lg transition-colors tab-btn"
+                [style.background-color]="activeTab === 'following' ? 'var(--color-accent)' : 'transparent'"
+                [style.color]="activeTab === 'following' ? '#fff' : 'var(--color-text-muted)'">
           Following
         </button>
       </div>
 
+      <!-- Skeleton -->
       @if (loading && users.length === 0) {
-        <div class="space-y-2">
+        <div class="space-y-1.5">
           @for (i of [1,2,3,4,5]; track i) {
-            <div class="bg-white rounded-xl border border-gray-100 p-3.5 flex items-center gap-3 animate-pulse">
-              <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"></div>
+            <div class="rounded-xl p-3.5 flex items-center gap-3 animate-pulse"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="w-10 h-10 rounded-full flex-shrink-0" style="background-color: var(--color-border);"></div>
               <div class="flex-1">
-                <div class="h-3 bg-gray-200 rounded w-28 mb-1.5"></div>
-                <div class="h-2 bg-gray-100 rounded w-20"></div>
+                <div class="h-3 rounded w-28 mb-1.5" style="background-color: var(--color-border);"></div>
+                <div class="h-2 rounded w-20" style="background-color: color-mix(in srgb, var(--color-border) 60%, transparent);"></div>
               </div>
             </div>
           }
         </div>
       }
 
+      <!-- Empty -->
       @if (!loading && users.length === 0) {
         <div class="text-center py-12">
-          <p class="text-gray-400">No {{ activeTab }} yet</p>
+          <p style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+            No {{ activeTab }} yet
+          </p>
         </div>
       }
 
-      <div class="space-y-2">
+      <div class="space-y-1.5">
         @for (user of users; track user.id) {
-          <div class="bg-white rounded-xl border border-gray-100 p-3.5 flex items-center gap-3">
+          <div class="rounded-xl p-3.5 flex items-center gap-3"
+               style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
             <a [routerLink]="['/profile', user.username]" class="flex items-center gap-3 flex-1 min-w-0">
               <app-avatar [url]="user.avatarUrl" [name]="user.displayName" size="md"/>
               <div class="min-w-0">
-                <p class="font-semibold text-sm text-gray-900 truncate">{{ user.displayName }}</p>
-                <p class="text-xs text-gray-400 truncate">&#64;{{ user.username }}</p>
+                <p class="font-semibold text-sm truncate" style="color: var(--color-text-primary);">{{ user.displayName }}</p>
+                <p class="text-xs truncate" style="color: var(--color-text-muted); font-family: var(--font-mono);">&#64;{{ user.username }}</p>
               </div>
             </a>
             @if (user.id !== currentUserId) {
               <button (click)="toggleFollow(user)"
-                      class="px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors flex-shrink-0"
-                      [class.bg-primary-600]="!user['isFollowing'] && !user['isRequested']"
-                      [class.text-white]="!user['isFollowing'] && !user['isRequested']"
-                      [class.border-transparent]="!user['isFollowing'] && !user['isRequested']"
-                      [class.border-gray-200]="user['isFollowing'] || user['isRequested']"
-                      [class.text-gray-600]="user['isFollowing'] || user['isRequested']">
-                @if (user['isFollowing']) {
-                  Following
-                } @else if (user['isRequested']) {
-                  Requested
-                } @else {
-                  Follow
-                }
+                      class="px-3 py-1.5 text-xs font-semibold rounded-full transition-opacity hover:opacity-85 flex-shrink-0"
+                      [style.background-color]="(!user['isFollowing'] && !user['isRequested']) ? 'var(--color-accent)' : 'transparent'"
+                      [style.color]="(!user['isFollowing'] && !user['isRequested']) ? '#fff' : 'var(--color-text-secondary)'"
+                      [style.border]="(user['isFollowing'] || user['isRequested']) ? '1px solid var(--color-border)' : '1px solid var(--color-accent)'">
+                @if (user['isFollowing']) { Following }
+                @else if (user['isRequested']) { Requested }
+                @else { Follow }
               </button>
             }
           </div>
@@ -72,10 +72,10 @@
       @if (hasMore) {
         <div class="text-center mt-5">
           <button (click)="loadMore()" [disabled]="loading"
-                  class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+                  class="text-xs font-medium transition-opacity disabled:opacity-40 hover:opacity-70"
+                  style="color: var(--color-accent); font-family: var(--font-mono);">
             Load more
           </button>
         </div>
       }
     </div>
-  

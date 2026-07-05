@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-avatar',
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage],
+  imports: [CommonModule],
   templateUrl: './avatar.component.html',
 })
 export class AvatarComponent {

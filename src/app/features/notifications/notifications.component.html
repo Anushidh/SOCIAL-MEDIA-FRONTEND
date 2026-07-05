@@ -1,75 +1,97 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+
       <div class="flex items-center justify-between mb-5">
-        <h1 class="text-xl font-bold text-gray-900">Notifications</h1>
+        <h1 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 400; letter-spacing: -0.02em; color: var(--color-text-primary);">
+          Notifications
+        </h1>
         @if (hasUnread) {
-          <button (click)="markAllRead()" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+          <button (click)="markAllRead()"
+                  class="text-xs font-medium transition-opacity hover:opacity-70"
+                  style="color: var(--color-accent); font-family: var(--font-mono);">
             Mark all read
           </button>
         }
       </div>
 
+      <!-- Skeleton -->
       @if (loading && notifications.length === 0) {
-        <div class="space-y-3">
+        <div class="space-y-2">
           @for (i of [1,2,3,4,5]; track i) {
-            <div class="bg-white rounded-xl border border-gray-100 p-4 animate-pulse flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"></div>
+            <div class="rounded-xl p-4 flex items-center gap-3 animate-pulse"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="w-9 h-9 rounded-full flex-shrink-0" style="background-color: var(--color-border);"></div>
               <div class="flex-1">
-                <div class="h-3 bg-gray-200 rounded w-3/4 mb-1.5"></div>
-                <div class="h-2 bg-gray-100 rounded w-1/3"></div>
+                <div class="h-3 rounded w-3/4 mb-1.5" style="background-color: var(--color-border);"></div>
+                <div class="h-2 rounded w-1/3" style="background-color: color-mix(in srgb, var(--color-border) 60%, transparent);"></div>
               </div>
             </div>
           }
         </div>
       }
 
+      <!-- Empty -->
       @if (!loading && notifications.length === 0) {
         <div class="text-center py-16">
-          <svg class="w-12 h-12 mx-auto text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <svg class="w-10 h-10 mx-auto mb-3" style="color: var(--color-border);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
           </svg>
-          <p class="text-gray-400 font-medium">No notifications yet</p>
+          <p class="font-medium" style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+            No notifications yet
+          </p>
         </div>
       }
 
-      <div class="space-y-2">
+      <!-- List -->
+      <div class="space-y-1.5">
         @for (notif of notifications; track notif.id) {
-          <div class="bg-white rounded-xl border p-4 flex items-start gap-3 transition-colors cursor-pointer group"
-               [class.border-primary-100]="!notif.isRead"
-               [class.bg-primary-50]="!notif.isRead"
-               [class.border-gray-100]="notif.isRead"
+          <div class="rounded-xl p-4 flex items-start gap-3 transition-colors cursor-pointer group notif-row"
+               [style.background-color]="notif.isRead ? 'var(--color-surface)' : 'color-mix(in srgb, var(--color-accent) 5%, var(--color-surface))'"
+               [style.border-color]="notif.isRead ? 'var(--color-border)' : 'color-mix(in srgb, var(--color-accent) 25%, var(--color-border))'"
+               style="border: 1px solid;"
                (click)="markRead(notif)">
+
             <app-avatar [url]="notif.actor?.avatarUrl" [name]="notif.actor?.displayName" size="sm"/>
+
             <div class="flex-1 min-w-0">
-              <p class="text-sm text-gray-800">
+              <p class="text-sm" style="color: var(--color-text-primary); line-height: 1.55;">
                 <a [routerLink]="['/profile', notif.actor?.username]"
-                   class="font-semibold hover:text-primary-600" (click)="$event.stopPropagation()">
+                   class="font-semibold notif-actor-link"
+                   style="color: var(--color-text-primary);"
+                   (click)="$event.stopPropagation()">
                   {{ notif.actor?.displayName }}
                 </a>
                 {{ getNotificationText(notif.type) }}
               </p>
-              <p class="text-xs text-gray-400 mt-0.5 mb-2">{{ notif.createdAt | timeAgo }}</p>
+              <p class="text-xs mt-0.5" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+                {{ notif.createdAt | timeAgo }}
+              </p>
               @if (notif.type === 'follow_request') {
-                <div class="flex gap-2 mt-2">
-                  <button (click)="acceptRequest(notif, $event)" class="px-3 py-1.5 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                <div class="flex gap-2 mt-2.5">
+                  <button (click)="acceptRequest(notif, $event)"
+                          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-opacity hover:opacity-85"
+                          style="background-color: var(--color-accent); color: #fff; border: 1px solid var(--color-accent);">
                     Accept
                   </button>
-                  <button (click)="denyRequest(notif, $event)" class="px-3 py-1.5 text-xs font-semibold border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button (click)="denyRequest(notif, $event)"
+                          class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors notif-decline-btn"
+                          style="border: 1px solid var(--color-border); color: var(--color-text-secondary);">
                     Decline
                   </button>
                 </div>
               }
             </div>
+
             <div class="flex items-center gap-2 flex-shrink-0">
               @if (!notif.isRead) {
-                <div class="w-2 h-2 rounded-full bg-primary-500"></div>
+                <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--color-accent);"></div>
               }
-              <button
-                (click)="deleteNotification(notif, $event)"
-                class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500 p-1 rounded"
-                title="Delete notification">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button (click)="deleteNotification(notif, $event)"
+                      class="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg notif-delete-btn"
+                      style="color: var(--color-text-muted);"
+                      title="Delete notification">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
@@ -81,10 +103,10 @@
       @if (hasMore) {
         <div class="text-center mt-5">
           <button (click)="loadMore()" [disabled]="loading"
-                  class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+                  class="text-xs font-medium transition-opacity disabled:opacity-40 hover:opacity-70"
+                  style="color: var(--color-accent); font-family: var(--font-mono);">
             Load more
           </button>
         </div>
       }
     </div>
-  

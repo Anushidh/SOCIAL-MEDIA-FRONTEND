@@ -1,32 +1,40 @@
-<div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+     style="background-color: rgba(0,0,0,0.45); backdrop-filter: blur(4px);"
      (click)="cancelled.emit()">
-  <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl"
+  <div class="w-full max-w-sm rounded-2xl p-6 animate-fade-up"
+       style="background-color: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 16px 48px rgba(0,0,0,0.12);"
        (click)="$event.stopPropagation()">
 
     <!-- Icon -->
-    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-50 mx-auto mb-4">
-      <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+    <div class="flex items-center justify-center w-11 h-11 rounded-full mx-auto mb-4"
+         style="background-color: color-mix(in srgb, var(--color-error) 10%, transparent);">
+      <svg class="w-5 h-5" style="color: var(--color-error);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
       </svg>
     </div>
 
-    <h2 class="text-base font-bold text-gray-900 text-center mb-1">{{ title }}</h2>
+    <h2 class="text-center mb-1.5"
+        style="font-family: var(--font-heading); font-size: 1.1rem; letter-spacing: -0.01em; color: var(--color-text-primary);">
+      {{ title }}
+    </h2>
 
     @if (message) {
-      <p class="text-sm text-gray-500 text-center mb-5">{{ message }}</p>
+      <p class="text-sm text-center mb-6" style="color: var(--color-text-muted);">{{ message }}</p>
     } @else {
-      <div class="mb-5"></div>
+      <div class="mb-6"></div>
     }
 
     <div class="flex gap-3">
       <button (click)="cancelled.emit()"
-              class="flex-1 py-2.5 text-sm font-semibold border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-700">
+              class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors modal-cancel-btn"
+              style="border: 1px solid var(--color-border); color: var(--color-text-secondary);">
         Cancel
       </button>
       <button (click)="confirmed.emit()"
               [disabled]="loading"
-              [class]="'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 ' + confirmClass">
+              [class]="'flex-1 py-2.5 text-sm font-semibold rounded-xl transition-opacity disabled:opacity-40 ' + confirmClass">
         {{ loading ? 'Deleting…' : confirmLabel }}
       </button>
     </div>

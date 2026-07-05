@@ -1,55 +1,68 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
 
-    <div class="text-center mb-6">
-      <div class="text-4xl mb-3">📧</div>
-      <h1 class="text-2xl font-bold text-gray-900">Verify your email</h1>
-      <p class="text-gray-500 mt-2 text-sm">
-        We sent a 6-digit code to <span class="font-medium text-gray-700">{{ email }}</span>
-      </p>
-    </div>
+<div class="min-h-screen flex items-center justify-center px-4"
+     style="background-color: var(--color-background);">
+  <div class="w-full max-w-md">
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-      <div class="mb-5">
-        <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">Verification code</label>
-        <input
-          id="otp"
-          type="text"
-          formControlName="otp"
-          maxlength="6"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          placeholder="_ _ _ _ _ _"
-          class="w-full border rounded-lg px-4 py-3 text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-          [class.border-red-500]="submitted && f['otp'].invalid"
-        />
-        @if (submitted && f['otp'].errors?.['required']) {
-          <p class="text-red-500 text-xs mt-1">Please enter the code</p>
-        }
-        @if (submitted && f['otp'].errors?.['minlength']) {
-          <p class="text-red-500 text-xs mt-1">Code must be 6 digits</p>
-        }
+    <div class="rounded-2xl p-8"
+         style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+
+      <div class="text-center mb-7">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mx-auto mb-5"
+             style="background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);">
+          <svg class="w-5 h-5" style="color: var(--color-accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h1 style="font-family: var(--font-heading); font-size: clamp(1.5rem, 4vw, 1.875rem); font-weight: 400; letter-spacing: -0.02em; color: var(--color-text-primary);">
+          Verify your email
+        </h1>
+        <p class="mt-2 text-sm" style="color: var(--color-text-muted);">
+          We sent a 6-digit code to
+          <span class="font-medium" style="color: var(--color-text-primary);">{{ email }}</span>
+        </p>
       </div>
 
-      <button
-        type="submit"
-        [disabled]="loading"
-        class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition"
-      >
-        {{ loading ? 'Verifying...' : 'Verify Email' }}
-      </button>
-    </form>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="mb-5">
+          <label for="otp" class="block text-xs font-medium mb-1.5"
+                 style="color: var(--color-text-secondary); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase;">
+            Verification code
+          </label>
+          <input
+            id="otp"
+            type="text"
+            formControlName="otp"
+            maxlength="6"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            placeholder="_ _ _ _ _ _"
+            class="w-full rounded-lg px-4 py-3 text-center text-2xl tracking-[0.5em] transition-colors auth-input focus:outline-none"
+            style="border: 1px solid var(--color-border); background-color: var(--color-background); color: var(--color-text-primary); font-family: var(--font-mono);"
+            [class.border-error]="submitted && f['otp'].invalid"/>
+          @if (submitted && f['otp'].errors?.['required']) {
+            <p class="text-xs mt-1" style="color: var(--color-error);">Please enter the code</p>
+          }
+          @if (submitted && f['otp'].errors?.['minlength']) {
+            <p class="text-xs mt-1" style="color: var(--color-error);">Code must be 6 digits</p>
+          }
+        </div>
 
-    <div class="mt-6 text-center text-sm text-gray-500">
-      Didn't receive the code?
-      <button
-        (click)="resendOtp()"
-        [disabled]="resending"
-        class="ml-1 text-blue-600 hover:underline disabled:opacity-50 font-medium"
-      >
-        {{ resending ? 'Sending...' : 'Resend' }}
-      </button>
+        <button type="submit" [disabled]="loading"
+                class="w-full py-2.5 text-sm font-semibold rounded-lg transition-opacity disabled:opacity-40"
+                style="background-color: var(--color-accent); color: #fff; border: 1px solid var(--color-accent);">
+          {{ loading ? 'Verifying…' : 'Verify Email' }}
+        </button>
+      </form>
+
+      <div class="mt-5 text-center text-sm" style="color: var(--color-text-muted);">
+        Didn't receive the code?
+        <button (click)="resendOtp()" [disabled]="resending"
+                class="ml-1 font-medium transition-opacity disabled:opacity-40 auth-link"
+                style="color: var(--color-accent); background: none; border: none; cursor: pointer;">
+          {{ resending ? 'Sending…' : 'Resend' }}
+        </button>
+      </div>
     </div>
-
   </div>
 </div>

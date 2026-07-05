@@ -4,42 +4,45 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Portfolio-inspired palette
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          50:  '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6',
+          600: '#0f766e', // accent — main CTA / active state
+          700: '#115e59',
+          800: '#134e4a',
+          900: '#042f2e',
         },
-        secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-        },
+        surface: '#FFFFFF',
+        background: '#FAFAF7',
+        border: '#E7E5E4',
+        // Text scale
+        'text-primary':   '#242424',
+        'text-secondary': '#6B6B6B',
+        'text-muted':     '#9A9A9A',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        serif:   ['"Instrument Serif"', 'Georgia', 'serif'],
+        mono:    ['"JetBrains Mono"', '"Courier New"', 'monospace'],
       },
       keyframes: {
         'slide-in': {
-          '0%': { opacity: '0', transform: 'translateX(100%)' },
+          '0%':   { opacity: '0', transform: 'translateX(100%)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'fade-up': {
+          '0%':   { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
       animation: {
-        'slide-in': 'slide-in 0.2s ease-out',
+        'slide-in': 'slide-in 0.3s cubic-bezier(0.22,1,0.36,1)',
+        'fade-up':  'fade-up  0.4s cubic-bezier(0.22,1,0.36,1)',
       },
     },
   },

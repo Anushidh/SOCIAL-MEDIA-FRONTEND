@@ -1,42 +1,52 @@
 
-    <div class="h-[calc(100vh-3.5rem)] md:h-auto md:min-h-[calc(100vh-0px)] flex">
+    <div class="h-[calc(100vh-3.5rem)] md:h-screen flex"
+         style="background-color: var(--color-background);">
 
       <!-- Conversations sidebar -->
-      <div class="w-full md:w-80 bg-white border-r border-gray-100 flex flex-col"
+      <div class="w-full md:w-80 flex flex-col"
+           style="background-color: var(--color-surface); border-right: 1px solid var(--color-border);"
            [class.hidden]="!!activeConversation"
            [class.md:flex]="true">
-        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-          <h1 class="font-bold text-gray-900 text-lg">Messages</h1>
+
+        <div class="px-4 py-3.5 flex items-center justify-between"
+             style="border-bottom: 1px solid var(--color-border);">
+          <h1 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 400; letter-spacing: -0.02em; color: var(--color-text-primary);">
+            Messages
+          </h1>
           <button (click)="showNewChat = true"
-                  class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-primary-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors msg-compose-btn"
+                  style="color: var(--color-text-muted); border: 1px solid var(--color-border);">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
           </button>
         </div>
 
-        <!-- New conversation search -->
+        <!-- New chat search -->
         @if (showNewChat) {
-          <div class="p-3 border-b border-gray-100">
+          <div class="p-3" style="border-bottom: 1px solid var(--color-border);">
             <div class="relative">
-              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+                   style="color: var(--color-text-muted);"
                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
               </svg>
               <input [(ngModel)]="newChatQuery" (ngModelChange)="onNewChatSearch($event)"
                      placeholder="Search people…" autofocus
-                     class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                     class="w-full pl-9 pr-3 py-2 text-sm rounded-lg transition-colors msg-search focus:outline-none"
+                     style="background-color: var(--color-background); border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-body);">
             </div>
             @if (searchedUsers.length > 0) {
-              <div class="mt-2 space-y-1 max-h-48 overflow-y-auto">
+              <div class="mt-2 space-y-0.5 max-h-48 overflow-y-auto">
                 @for (user of searchedUsers; track user.id) {
                   <button (click)="startConversation(user)"
-                          class="flex items-center gap-2.5 w-full p-2 rounded-lg hover:bg-gray-50 text-left transition-colors">
+                          class="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg text-left transition-colors msg-user-row">
                     <app-avatar [url]="user.avatarUrl" [name]="user.displayName" size="sm"/>
                     <div class="min-w-0">
-                      <p class="text-sm font-medium text-gray-900 truncate">{{ user.displayName }}</p>
-                      <p class="text-xs text-gray-400">&#64;{{ user.username }}</p>
+                      <p class="text-sm font-medium truncate" style="color: var(--color-text-primary);">{{ user.displayName }}</p>
+                      <p class="text-xs truncate" style="color: var(--color-text-muted); font-family: var(--font-mono);">&#64;{{ user.username }}</p>
                     </div>
                   </button>
                 }
@@ -46,14 +56,15 @@
         }
 
         <div class="flex-1 overflow-y-auto">
+          <!-- Skeleton -->
           @if (loadingConversations) {
-            <div class="space-y-1 p-2">
+            <div class="space-y-0.5 p-2">
               @for (i of [1,2,3]; track i) {
                 <div class="flex items-center gap-3 p-3 animate-pulse">
-                  <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"></div>
+                  <div class="w-10 h-10 rounded-full flex-shrink-0" style="background-color: var(--color-border);"></div>
                   <div class="flex-1">
-                    <div class="h-3 bg-gray-200 rounded w-24 mb-1.5"></div>
-                    <div class="h-2 bg-gray-100 rounded w-32"></div>
+                    <div class="h-3 rounded w-24 mb-1.5" style="background-color: var(--color-border);"></div>
+                    <div class="h-2 rounded w-32" style="background-color: color-mix(in srgb, var(--color-border) 60%, transparent);"></div>
                   </div>
                 </div>
               }
@@ -62,23 +73,26 @@
 
           @for (conv of conversations; track conv.id) {
             <button (click)="openConversation(conv)"
-                    class="w-full flex items-center gap-3 p-3.5 hover:bg-gray-50 transition-colors text-left"
-                    [class.bg-primary-50]="activeConversation?.id === conv.id">
+                    class="w-full flex items-center gap-3 px-3.5 py-3 text-left transition-colors conv-row"
+                    [style.background-color]="activeConversation?.id === conv.id ? 'color-mix(in srgb, var(--color-accent) 8%, transparent)' : 'transparent'">
               <app-avatar [url]="getOtherParticipant(conv)?.avatarUrl"
                           [name]="getOtherParticipant(conv)?.displayName" size="md"/>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between">
-                  <p class="font-semibold text-gray-900 text-sm truncate">
+                  <p class="font-semibold text-sm truncate" style="color: var(--color-text-primary);">
                     {{ getOtherParticipant(conv)?.displayName }}
                   </p>
-                  <span class="text-xs text-gray-400">{{ conv.updatedAt | timeAgo }}</span>
+                  <span class="text-xs flex-shrink-0" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+                    {{ conv.updatedAt | timeAgo }}
+                  </span>
                 </div>
-                <p class="text-xs text-gray-400 truncate mt-0.5">
+                <p class="text-xs truncate mt-0.5" style="color: var(--color-text-muted);">
                   {{ conv.lastMessage?.content || 'No messages yet' }}
                 </p>
               </div>
               @if (conv.unreadCount > 0) {
-                <span class="w-5 h-5 rounded-full bg-primary-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                <span class="w-4.5 h-4.5 rounded-full text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0"
+                      style="width:18px;height:18px;background-color:var(--color-accent);font-family:var(--font-mono);">
                   {{ conv.unreadCount }}
                 </span>
               }
@@ -87,83 +101,97 @@
 
           @if (!loadingConversations && conversations.length === 0) {
             <div class="text-center py-12 px-4">
-              <p class="text-gray-400 text-sm">No conversations yet</p>
+              <p class="text-sm" style="color: var(--color-text-muted);">No conversations yet</p>
             </div>
           }
         </div>
       </div>
 
-      <!-- Chat area -->
+      <!-- Active chat -->
       @if (activeConversation) {
-        <div class="flex-1 flex flex-col bg-gray-50">
+        <div class="flex-1 flex flex-col" style="background-color: var(--color-background);">
+
           <!-- Chat header -->
-          <div class="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
-            <button class="md:hidden text-gray-500 mr-1" (click)="activeConversation = null">
+          <div class="px-4 py-3 flex items-center gap-3"
+               style="background-color: var(--color-surface); border-bottom: 1px solid var(--color-border);">
+            <button class="md:hidden transition-opacity hover:opacity-60"
+                    style="color: var(--color-text-muted);"
+                    (click)="activeConversation = null">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
             <app-avatar [url]="getOtherParticipant(activeConversation)?.avatarUrl"
                         [name]="getOtherParticipant(activeConversation)?.displayName" size="sm"/>
             <div>
-              <p class="font-semibold text-gray-900 text-sm">
+              <p class="font-semibold text-sm" style="color: var(--color-text-primary);">
                 {{ getOtherParticipant(activeConversation)?.displayName }}
               </p>
-              <p class="text-xs text-gray-400">
+              <p class="text-xs" style="color: var(--color-text-muted); font-family: var(--font-mono);">
                 &#64;{{ getOtherParticipant(activeConversation)?.username }}
               </p>
             </div>
           </div>
 
-          <!-- Messages -->
-          <div class="flex-1 overflow-y-auto p-4 space-y-3" #messagesContainer>
+          <!-- Message bubbles -->
+          <div class="flex-1 overflow-y-auto p-4 space-y-2.5" #messagesContainer>
             @for (message of messages; track message.id) {
               <div class="flex" [class.justify-end]="message.senderId === currentUserId">
                 <div class="max-w-[75%] px-3.5 py-2 rounded-2xl text-sm leading-relaxed"
-                     [class.bg-primary-600]="message.senderId === currentUserId"
-                     [class.text-white]="message.senderId === currentUserId"
-                     [class.bg-white]="message.senderId !== currentUserId"
-                     [class.text-gray-800]="message.senderId !== currentUserId"
-                     [class.shadow-sm]="message.senderId !== currentUserId">
+                     [style.background-color]="message.senderId === currentUserId ? 'var(--color-accent)' : 'var(--color-surface)'"
+                     [style.color]="message.senderId === currentUserId ? '#fff' : 'var(--color-text-primary)'"
+                     [style.border]="message.senderId !== currentUserId ? '1px solid var(--color-border)' : 'none'">
                   {{ message.content }}
-                  <span class="text-[10px] opacity-60 ml-2 inline-block">{{ message.createdAt | timeAgo }}</span>
+                  <span class="text-[10px] opacity-60 ml-2 inline-block" style="font-family: var(--font-mono);">
+                    {{ message.createdAt | timeAgo }}
+                  </span>
                 </div>
               </div>
             }
-
             @if (loadingMessages) {
-              <div class="flex justify-center">
-                <div class="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin"></div>
+              <div class="flex justify-center py-2">
+                <svg class="w-4 h-4 animate-spin" style="color: var(--color-accent);" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                </svg>
               </div>
             }
           </div>
 
-          <!-- Message input -->
-          <div class="bg-white border-t border-gray-100 p-3 pb-[calc(0.75rem+3.5rem)] md:pb-3">
+          <!-- Input bar -->
+          <div class="p-3 pb-[calc(0.75rem+3.5rem)] md:pb-3"
+               style="background-color: var(--color-surface); border-top: 1px solid var(--color-border);">
             <div class="flex items-center gap-2">
               <input [(ngModel)]="messageInput" (keyup.enter)="sendMessage()"
                      placeholder="Message…"
-                     class="flex-1 px-4 py-2.5 bg-gray-50 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+                     class="flex-1 px-4 py-2.5 rounded-full text-sm transition-colors msg-input focus:outline-none"
+                     style="background-color: var(--color-background); border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-body);">
               <button (click)="sendMessage()" [disabled]="!messageInput.trim() || sending"
-                      class="w-9 h-9 flex items-center justify-center bg-primary-600 hover:bg-primary-700 disabled:opacity-50 rounded-full transition-colors">
+                      class="w-9 h-9 flex items-center justify-center rounded-full transition-opacity disabled:opacity-40 hover:opacity-85"
+                      style="background-color: var(--color-accent);">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                     d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                 </svg>
               </button>
             </div>
           </div>
         </div>
+
       } @else {
-        <div class="hidden md:flex flex-1 items-center justify-center bg-gray-50">
+        <!-- Empty state -->
+        <div class="hidden md:flex flex-1 items-center justify-center"
+             style="background-color: var(--color-background);">
           <div class="text-center">
-            <svg class="w-12 h-12 mx-auto text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            <svg class="w-10 h-10 mx-auto mb-3" style="color: var(--color-border);"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
-            <p class="text-gray-400 font-medium">Select a conversation</p>
+            <p style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+              Select a conversation
+            </p>
           </div>
         </div>
       }
     </div>
-  

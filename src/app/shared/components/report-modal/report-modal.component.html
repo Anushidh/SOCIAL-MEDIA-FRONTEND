@@ -1,37 +1,48 @@
 
-    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="close.emit()">
-      <div class="bg-white rounded-2xl w-full max-w-sm p-5" (click)="$event.stopPropagation()">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         style="background-color: rgba(0,0,0,0.45); backdrop-filter: blur(4px);"
+         (click)="close.emit()">
+      <div class="w-full max-w-sm rounded-2xl p-5 animate-fade-up"
+           style="background-color: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 16px 48px rgba(0,0,0,0.12);"
+           (click)="$event.stopPropagation()">
+
         <div class="flex items-center justify-between mb-4">
-          <h2 class="font-bold text-gray-900">Report content</h2>
-          <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h2 style="font-family: var(--font-heading); font-size: 1.05rem; letter-spacing: -0.01em; color: var(--color-text-primary);">
+            Report content
+          </h2>
+          <button (click)="close.emit()"
+                  class="w-7 h-7 rounded-lg flex items-center justify-center transition-colors report-close-btn"
+                  style="color: var(--color-text-muted); border: 1px solid var(--color-border);">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
 
-        <p class="text-sm text-gray-500 mb-4">Why are you reporting this?</p>
+        <p class="text-sm mb-4" style="color: var(--color-text-muted);">Why are you reporting this?</p>
 
-        <div class="space-y-2 mb-4">
+        <div class="space-y-1 mb-4">
           @for (r of reasons; track r.value) {
-            <label class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 cursor-pointer">
+            <label class="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors report-reason-row">
               <input type="radio" [value]="r.value" [(ngModel)]="selectedReason"
-                     class="text-primary-600 focus:ring-primary-500">
-              <span class="text-sm text-gray-700">{{ r.label }}</span>
+                     class="flex-shrink-0"
+                     style="accent-color: var(--color-accent);">
+              <span class="text-sm" style="color: var(--color-text-primary);">{{ r.label }}</span>
             </label>
           }
         </div>
 
         @if (selectedReason === 'other') {
           <textarea [(ngModel)]="description" placeholder="Please describe the issue…" rows="2"
-                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none mb-4">
+                    class="w-full px-3 py-2.5 text-sm rounded-lg resize-none mb-4 transition-colors report-textarea focus:outline-none"
+                    style="border: 1px solid var(--color-border); background-color: var(--color-background); color: var(--color-text-primary); font-family: var(--font-body);">
           </textarea>
         }
 
         <button (click)="submit()" [disabled]="!selectedReason || submitting"
-                class="w-full py-2.5 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors">
+                class="w-full py-2.5 text-sm font-semibold rounded-lg transition-opacity disabled:opacity-40"
+                style="background-color: var(--color-error); color: #fff; border: 1px solid var(--color-error);">
           {{ submitting ? 'Submitting…' : 'Submit Report' }}
         </button>
       </div>
     </div>
-  

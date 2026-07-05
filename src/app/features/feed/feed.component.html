@@ -1,43 +1,57 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
 
-      <!-- Create post -->
-      <div class="bg-white rounded-xl border border-gray-100 p-4 mb-4">
+      <!-- Create post prompt -->
+      <div class="rounded-xl p-4 mb-4"
+           style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
         <div class="flex items-center gap-3">
           <app-avatar [url]="currentUser?.avatarUrl" [name]="currentUser?.displayName" size="sm"/>
           <button (click)="showComposer = true"
-                  class="flex-1 text-left px-4 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-400 transition-colors">
+                  class="flex-1 text-left px-4 py-2.5 rounded-full text-sm transition-colors composer-trigger"
+                  style="background-color: var(--color-background); color: var(--color-text-muted); border: 1px solid var(--color-border);">
             What's on your mind?
           </button>
         </div>
       </div>
 
-      <!-- Composer Modal -->
+      <!-- Composer modal -->
       @if (showComposer) {
-        <div class="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
-          <div class="bg-white rounded-2xl w-full max-w-lg">
-            <div class="flex items-center justify-between p-4 border-b">
-              <h2 class="font-bold text-gray-900">New Post</h2>
-              <button (click)="showComposer = false" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4"
+             style="background-color: rgba(0,0,0,0.4); backdrop-filter: blur(4px);">
+          <div class="w-full max-w-lg rounded-2xl animate-fade-up"
+               style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+            <div class="flex items-center justify-between px-5 py-4"
+                 style="border-bottom: 1px solid var(--color-border);">
+              <h2 style="font-family: var(--font-heading); font-size: 1.1rem; letter-spacing: -0.01em; color: var(--color-text-primary);">
+                New Post
+              </h2>
+              <button (click)="showComposer = false"
+                      class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors composer-close"
+                      style="color: var(--color-text-muted); border: 1px solid var(--color-border);">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
             </div>
-            <div class="p-4">
+            <div class="p-5">
               <div class="flex gap-3">
                 <app-avatar [url]="currentUser?.avatarUrl" [name]="currentUser?.displayName" size="sm"/>
                 <textarea [(ngModel)]="newPostContent"
                           placeholder="What's on your mind? Use #hashtags and @mentions"
                           rows="4"
-                          class="flex-1 resize-none border-0 focus:outline-none text-sm text-gray-800 placeholder-gray-400">
+                          class="flex-1 resize-none text-sm focus:outline-none"
+                          style="border: none; background: transparent; color: var(--color-text-primary); font-family: var(--font-body); line-height: 1.65;">
                 </textarea>
               </div>
-              <div class="flex items-center justify-between mt-3 pt-3 border-t">
-                <span class="text-xs text-gray-400">{{ 2200 - newPostContent.length }} chars left</span>
+              <div class="flex items-center justify-between mt-4 pt-4"
+                   style="border-top: 1px solid var(--color-border);">
+                <span class="text-xs" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+                  {{ 2200 - newPostContent.length }} chars left
+                </span>
                 <button (click)="createPost()"
                         [disabled]="!newPostContent.trim() || posting"
-                        class="px-5 py-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white text-sm font-semibold rounded-full transition-colors">
+                        class="px-5 py-2 text-sm font-semibold rounded-lg transition-opacity disabled:opacity-40"
+                        style="background-color: var(--color-accent); color: #fff; border: 1px solid var(--color-accent);">
                   {{ posting ? 'Posting…' : 'Post' }}
                 </button>
               </div>
@@ -46,55 +60,59 @@
         </div>
       }
 
-      <!-- Tabs -->
-      <div class="flex bg-white rounded-xl border border-gray-100 mb-4">
+      <!-- Feed / Explore tabs -->
+      <div class="flex rounded-xl mb-4 p-0.5"
+           style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
         <button (click)="activeTab = 'feed'; loadPosts()"
-                class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
-                [class.bg-primary-600]="activeTab === 'feed'"
-                [class.text-white]="activeTab === 'feed'"
-                [class.text-gray-500]="activeTab !== 'feed'">
+                class="flex-1 py-2 text-sm font-medium rounded-lg transition-colors tab-btn"
+                [style.background-color]="activeTab === 'feed' ? 'var(--color-accent)' : 'transparent'"
+                [style.color]="activeTab === 'feed' ? '#fff' : 'var(--color-text-muted)'">
           Feed
         </button>
         <button (click)="activeTab = 'explore'; loadPosts()"
-                class="flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors"
-                [class.bg-primary-600]="activeTab === 'explore'"
-                [class.text-white]="activeTab === 'explore'"
-                [class.text-gray-500]="activeTab !== 'explore'">
+                class="flex-1 py-2 text-sm font-medium rounded-lg transition-colors tab-btn"
+                [style.background-color]="activeTab === 'explore' ? 'var(--color-accent)' : 'transparent'"
+                [style.color]="activeTab === 'explore' ? '#fff' : 'var(--color-text-muted)'">
           Explore
         </button>
       </div>
 
-      <!-- Posts -->
+      <!-- Skeleton -->
       @if (loading && posts.length === 0) {
-        <div class="space-y-4">
+        <div class="space-y-3">
           @for (i of [1,2,3]; track i) {
-            <div class="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+            <div class="rounded-xl p-4 animate-pulse"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
               <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+                <div class="w-8 h-8 rounded-full" style="background-color: var(--color-border);"></div>
                 <div class="flex-1">
-                  <div class="h-3 bg-gray-200 rounded w-24 mb-1"></div>
-                  <div class="h-2 bg-gray-100 rounded w-16"></div>
+                  <div class="h-3 rounded w-24 mb-1.5" style="background-color: var(--color-border);"></div>
+                  <div class="h-2 rounded w-16" style="background-color: color-mix(in srgb, var(--color-border) 60%, transparent);"></div>
                 </div>
               </div>
               <div class="space-y-2">
-                <div class="h-3 bg-gray-200 rounded w-full"></div>
-                <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-3 rounded w-full" style="background-color: var(--color-border);"></div>
+                <div class="h-3 rounded w-4/5" style="background-color: var(--color-border);"></div>
               </div>
             </div>
           }
         </div>
       }
 
+      <!-- Empty -->
       @if (!loading && posts.length === 0) {
         <div class="text-center py-16">
-          <p class="text-gray-400 font-medium">No posts yet</p>
-          <p class="text-sm text-gray-300 mt-1">
+          <p class="font-medium" style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1.1rem;">
+            No posts yet
+          </p>
+          <p class="text-sm mt-1" style="color: var(--color-text-muted);">
             {{ activeTab === 'feed' ? 'Follow users to see their posts' : 'Be the first to post' }}
           </p>
         </div>
       }
 
-      <div class="space-y-4">
+      <!-- Posts -->
+      <div class="space-y-3">
         @for (post of posts; track post.id) {
           <app-post-card
             [post]="post"
@@ -107,20 +125,17 @@
         }
       </div>
 
-      <!-- Infinite scroll sentinel — replaces the manual "Load more" button -->
+      <!-- Infinite scroll sentinel -->
       @if (hasMore) {
-        <div
-          appInfiniteScroll
-          (scrolled)="loadMore()"
-          [threshold]="0.2"
-          class="flex justify-center py-6">
+        <div appInfiniteScroll (scrolled)="loadMore()" [threshold]="0.2"
+             class="flex justify-center py-6">
           @if (loading) {
-            <div class="flex items-center gap-2 text-gray-400 text-sm">
+            <div class="flex items-center gap-2 text-sm" style="color: var(--color-text-muted);">
               <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
               </svg>
-              Loading more…
+              <span style="font-family: var(--font-mono); font-size: 0.75rem;">Loading more…</span>
             </div>
           }
         </div>
@@ -135,4 +150,3 @@
           (close)="reportingPost = null"/>
       }
     </div>
-  

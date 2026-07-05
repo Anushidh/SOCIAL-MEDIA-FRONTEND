@@ -1,34 +1,45 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
-      <h1 class="text-xl font-bold text-gray-900 mb-5">Saved Posts</h1>
 
+      <h1 class="mb-5" style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 400; letter-spacing: -0.02em; color: var(--color-text-primary);">
+        Saved Posts
+      </h1>
+
+      <!-- Skeleton -->
       @if (loading && posts.length === 0) {
-        <div class="space-y-4">
+        <div class="space-y-3">
           @for (i of [1,2,3]; track i) {
-            <div class="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+            <div class="rounded-xl p-4 animate-pulse"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
               <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-full bg-gray-200"></div>
-                <div class="flex-1"><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+                <div class="w-8 h-8 rounded-full" style="background-color: var(--color-border);"></div>
+                <div class="flex-1">
+                  <div class="h-3 rounded w-24" style="background-color: var(--color-border);"></div>
+                </div>
               </div>
-              <div class="h-3 bg-gray-200 rounded w-full mb-1.5"></div>
-              <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+              <div class="h-3 rounded w-full mb-1.5" style="background-color: var(--color-border);"></div>
+              <div class="h-3 rounded w-2/3" style="background-color: var(--color-border);"></div>
             </div>
           }
         </div>
       }
 
+      <!-- Empty -->
       @if (!loading && posts.length === 0) {
-        <div class="text-center py-16 bg-white rounded-2xl border border-gray-100">
-          <svg class="w-12 h-12 mx-auto text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        <div class="text-center py-16 rounded-2xl"
+             style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+          <svg class="w-10 h-10 mx-auto mb-3" style="color: var(--color-border);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
               d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
           </svg>
-          <p class="text-gray-400 font-medium">No saved posts yet</p>
-          <p class="text-sm text-gray-300 mt-1">Bookmark posts to find them here later</p>
+          <p class="font-medium" style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+            No saved posts yet
+          </p>
+          <p class="text-sm mt-1" style="color: var(--color-text-muted);">Bookmark posts to find them here later</p>
         </div>
       }
 
-      <div class="space-y-4">
+      <div class="space-y-3">
         @for (post of posts; track post.id) {
           <app-post-card [post]="post"
             [currentUserId]="currentUserId"
@@ -43,7 +54,8 @@
       @if (hasMore) {
         <div class="text-center mt-6">
           <button (click)="loadMore()" [disabled]="loading"
-                  class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+                  class="text-xs font-medium transition-opacity disabled:opacity-40 hover:opacity-70"
+                  style="color: var(--color-accent); font-family: var(--font-mono);">
             Load more
           </button>
         </div>
@@ -57,4 +69,3 @@
           (close)="reportingPost = null"/>
       }
     </div>
-  

@@ -1,41 +1,55 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
-      <div class="flex items-center gap-2 mb-5">
-        <a routerLink="/search" class="text-gray-400 hover:text-gray-600">
+
+      <div class="flex items-center gap-3 mb-5">
+        <a routerLink="/search"
+           class="transition-opacity hover:opacity-60"
+           style="color: var(--color-text-muted);">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 19l-7-7 7-7"/>
           </svg>
         </a>
         <div>
-          <h1 class="text-xl font-bold text-gray-900">#{{ tagName }}</h1>
+          <h1 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 400; letter-spacing: -0.02em; color: var(--color-text-primary);">
+            #{{ tagName }}
+          </h1>
           @if (total > 0) {
-            <p class="text-sm text-gray-400">{{ total }} posts</p>
+            <p class="text-xs mt-0.5" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+              {{ total }} posts
+            </p>
           }
         </div>
       </div>
 
+      <!-- Skeleton -->
       @if (loading && posts.length === 0) {
-        <div class="space-y-4">
+        <div class="space-y-3">
           @for (i of [1,2,3]; track i) {
-            <div class="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+            <div class="rounded-xl p-4 animate-pulse"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
               <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-full bg-gray-200"></div>
-                <div class="flex-1"><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+                <div class="w-8 h-8 rounded-full" style="background-color: var(--color-border);"></div>
+                <div class="flex-1">
+                  <div class="h-3 rounded w-24" style="background-color: var(--color-border);"></div>
+                </div>
               </div>
-              <div class="h-3 bg-gray-200 rounded w-full mb-1.5"></div>
-              <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+              <div class="h-3 rounded w-full mb-1.5" style="background-color: var(--color-border);"></div>
+              <div class="h-3 rounded w-2/3" style="background-color: var(--color-border);"></div>
             </div>
           }
         </div>
       }
 
+      <!-- Empty -->
       @if (!loading && posts.length === 0) {
         <div class="text-center py-16">
-          <p class="text-gray-400">No posts with #{{ tagName }}</p>
+          <p style="color: var(--color-text-muted); font-family: var(--font-heading); font-size: 1rem;">
+            No posts with #{{ tagName }}
+          </p>
         </div>
       }
 
-      <div class="space-y-4">
+      <div class="space-y-3">
         @for (post of posts; track post.id) {
           <app-post-card [post]="post"
             (liked)="toggleLike($event)"
@@ -48,7 +62,8 @@
       @if (hasMore) {
         <div class="text-center mt-6">
           <button (click)="loadMore()" [disabled]="loading"
-                  class="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50">
+                  class="text-xs font-medium transition-opacity disabled:opacity-40 hover:opacity-70"
+                  style="color: var(--color-accent); font-family: var(--font-mono);">
             Load more
           </button>
         </div>
@@ -61,4 +76,3 @@
           (close)="reportingPost = null"/>
       }
     </div>
-  

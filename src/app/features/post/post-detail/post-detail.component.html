@@ -1,31 +1,42 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6 pb-20 md:pb-6">
+
       <!-- Back -->
-      <a routerLink="/feed" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 font-medium">
+      <a routerLink="/feed"
+         class="inline-flex items-center gap-1.5 text-sm font-medium mb-5 transition-colors back-link"
+         style="color: var(--color-text-muted);">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 19l-7-7 7-7"/>
         </svg>
         Back
       </a>
 
       @if (post) {
         <!-- Post -->
-        <div class="bg-white rounded-2xl border border-gray-100 p-5 mb-4">
+        <div class="rounded-2xl p-5 mb-4"
+             style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
           <div class="flex items-center gap-3 mb-4">
             <app-avatar [url]="post.author?.avatarUrl" [name]="post.author?.displayName" size="md"/>
             <div>
               <a [routerLink]="['/profile', post.author?.username]"
-                 class="font-semibold text-gray-900 hover:text-primary-600">
+                 class="font-semibold text-sm transition-colors detail-author-link"
+                 style="color: var(--color-text-primary);">
                 {{ post.author?.displayName }}
               </a>
-              <p class="text-xs text-gray-400">&#64;{{ post.author?.username }} · {{ post.createdAt | timeAgo }}</p>
+              <p class="text-xs" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+                &#64;{{ post.author?.username }} · {{ post.createdAt | timeAgo }}
+              </p>
             </div>
           </div>
 
-          <p class="text-gray-800 leading-relaxed whitespace-pre-wrap mb-4">{{ post.content }}</p>
+          <p class="leading-relaxed whitespace-pre-wrap mb-4"
+             style="color: var(--color-text-primary); font-size: 0.9375rem; line-height: 1.7;">
+            {{ post.content }}
+          </p>
 
           @if (post.imageUrls?.length) {
-            <div class="grid gap-1 mb-4" [ngClass]="(post.imageUrls?.length ?? 0) === 1 ? 'grid-cols-1' : 'grid-cols-2'">
+            <div class="grid gap-1 mb-4"
+                 [ngClass]="(post.imageUrls?.length ?? 0) === 1 ? 'grid-cols-1' : 'grid-cols-2'">
               @for (img of (post.imageUrls ?? []); track img) {
                 <img [src]="img" alt="Post image" class="w-full rounded-lg object-cover max-h-64">
               }
@@ -33,36 +44,41 @@
           }
 
           <!-- Actions -->
-          <div class="flex items-center gap-5 pt-3 border-t border-gray-50">
-            <button (click)="toggleLike()" class="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors"
-                    [class.text-red-500]="post.isLiked">
+          <div class="flex items-center gap-5 pt-3" style="border-top: 1px solid var(--color-border);">
+            <button (click)="toggleLike()"
+                    class="flex items-center gap-1.5 transition-colors post-action-btn"
+                    [style.color]="post.isLiked ? 'var(--color-error)' : 'var(--color-text-muted)'">
               <svg class="w-5 h-5" [attr.fill]="post.isLiked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
               </svg>
-              <span class="text-sm font-medium">{{ post.likesCount }}</span>
+              <span class="text-sm font-medium" style="font-family: var(--font-mono);">{{ post.likesCount }}</span>
             </button>
-            <span class="flex items-center gap-1.5 text-gray-400">
+            <span class="flex items-center gap-1.5" style="color: var(--color-text-muted);">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
               </svg>
-              <span class="text-sm font-medium">{{ post.commentsCount }}</span>
+              <span class="text-sm font-medium" style="font-family: var(--font-mono);">{{ post.commentsCount }}</span>
             </span>
           </div>
         </div>
 
         <!-- Add comment -->
-        <div class="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
+        <div class="rounded-2xl p-4 mb-4"
+             style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
           <div class="flex items-start gap-3">
             <app-avatar [url]="currentUser?.avatarUrl" [name]="currentUser?.displayName" size="sm"/>
             <div class="flex-1">
-              <textarea [(ngModel)]="commentInput" rows="2" placeholder="Write a comment…"
-                        class="w-full border-0 focus:outline-none text-sm text-gray-800 placeholder-gray-400 resize-none">
+              <textarea [(ngModel)]="commentInput" rows="2"
+                        placeholder="Write a comment…"
+                        class="w-full text-sm resize-none focus:outline-none comment-textarea"
+                        style="border: none; background: transparent; color: var(--color-text-primary); font-family: var(--font-body);">
               </textarea>
               <div class="flex justify-end mt-2">
                 <button (click)="addComment()" [disabled]="!commentInput.trim() || submitting"
-                        class="px-4 py-1.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white text-xs font-semibold rounded-full transition-colors">
+                        class="px-4 py-1.5 text-xs font-semibold rounded-full transition-opacity disabled:opacity-40 hover:opacity-85"
+                        style="background-color: var(--color-accent); color: #fff;">
                   Comment
                 </button>
               </div>
@@ -70,40 +86,50 @@
           </div>
         </div>
 
-        <!-- Comments -->
-        <div class="space-y-3">
+        <!-- Comments list -->
+        <div class="space-y-2">
           @for (comment of comments; track comment.id) {
-            <div class="bg-white rounded-xl border border-gray-100 p-4">
+            <div class="rounded-xl p-4"
+                 style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
               <div class="flex items-start gap-3">
                 <app-avatar [url]="comment.author?.avatarUrl" [name]="comment.author?.displayName" size="sm"/>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <a [routerLink]="['/profile', comment.author?.username]"
-                       class="font-semibold text-gray-900 text-sm hover:text-primary-600">
+                       class="font-semibold text-sm transition-colors detail-author-link"
+                       style="color: var(--color-text-primary);">
                       {{ comment.author?.displayName }}
                     </a>
-                    <span class="text-xs text-gray-400">{{ comment.createdAt | timeAgo }}</span>
+                    <span class="text-xs" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+                      {{ comment.createdAt | timeAgo }}
+                    </span>
                   </div>
-                  <p class="text-sm text-gray-700 mt-1">{{ comment.content }}</p>
+                  <p class="text-sm mt-1" style="color: var(--color-text-primary); line-height: 1.6;">
+                    {{ comment.content }}
+                  </p>
 
-                  <!-- Reply button -->
                   <button (click)="replyingTo = comment; replyInput = ''"
-                          class="text-xs text-gray-400 hover:text-primary-600 mt-1 font-medium">
+                          class="text-xs font-medium mt-1.5 transition-opacity hover:opacity-70"
+                          style="color: var(--color-accent);">
                     Reply
                   </button>
 
                   <!-- Replies -->
                   @if (comment.replies?.length) {
-                    <div class="mt-3 pl-3 border-l-2 border-gray-100 space-y-3">
+                    <div class="mt-3 pl-3 space-y-3" style="border-left: 2px solid var(--color-border);">
                       @for (reply of comment.replies; track reply.id) {
                         <div class="flex items-start gap-2">
                           <app-avatar [url]="reply.author?.avatarUrl" [name]="reply.author?.displayName" size="xs"/>
                           <div>
                             <div class="flex items-center gap-2">
-                              <span class="font-semibold text-gray-900 text-xs">{{ reply.author?.displayName }}</span>
-                              <span class="text-xs text-gray-400">{{ reply.createdAt | timeAgo }}</span>
+                              <span class="font-semibold text-xs" style="color: var(--color-text-primary);">
+                                {{ reply.author?.displayName }}
+                              </span>
+                              <span class="text-xs" style="color: var(--color-text-muted); font-family: var(--font-mono);">
+                                {{ reply.createdAt | timeAgo }}
+                              </span>
                             </div>
-                            <p class="text-xs text-gray-700 mt-0.5">{{ reply.content }}</p>
+                            <p class="text-xs mt-0.5" style="color: var(--color-text-primary);">{{ reply.content }}</p>
                           </div>
                         </div>
                       }
@@ -114,21 +140,29 @@
                   @if (replyingTo?.id === comment.id) {
                     <div class="mt-3 flex items-center gap-2">
                       <input [(ngModel)]="replyInput" placeholder="Write a reply…" (keyup.enter)="addReply()"
-                             class="flex-1 px-3 py-1.5 text-xs bg-gray-50 rounded-full border-0 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                             class="flex-1 px-3 py-1.5 text-xs rounded-full focus:outline-none transition-colors reply-input"
+                             style="border: 1px solid var(--color-border); background-color: var(--color-background); color: var(--color-text-primary); font-family: var(--font-body);">
                       <button (click)="addReply()" [disabled]="!replyInput.trim()"
-                              class="px-3 py-1.5 bg-primary-600 text-white text-xs rounded-full disabled:opacity-50">
+                              class="px-3 py-1.5 text-xs font-semibold rounded-full transition-opacity disabled:opacity-40 hover:opacity-85"
+                              style="background-color: var(--color-accent); color: #fff;">
                         Reply
                       </button>
-                      <button (click)="replyingTo = null" class="text-xs text-gray-400">Cancel</button>
+                      <button (click)="replyingTo = null"
+                              class="text-xs transition-opacity hover:opacity-70"
+                              style="color: var(--color-text-muted);">
+                        Cancel
+                      </button>
                     </div>
                   }
                 </div>
 
                 <!-- Delete own comment -->
                 @if (comment.authorId === currentUser?.id) {
-                  <button (click)="deleteComment(comment)" class="text-gray-300 hover:text-red-500 transition-colors">
+                  <button (click)="deleteComment(comment)"
+                          class="transition-colors comment-delete-btn"
+                          style="color: var(--color-border);">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
                   </button>
@@ -139,4 +173,3 @@
         </div>
       }
     </div>
-  
