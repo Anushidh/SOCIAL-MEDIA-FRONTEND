@@ -116,7 +116,7 @@
                style="background-color: var(--color-surface); border-bottom: 1px solid var(--color-border);">
             <button class="md:hidden transition-opacity hover:opacity-60"
                     style="color: var(--color-text-muted);"
-                    (click)="activeConversation = null">
+                    (click)="backToList()">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 19l-7-7 7-7"/>
               </svg>
@@ -158,11 +158,17 @@
             }
           </div>
 
+          @if (isTyping) {
+            <div class="px-4 pb-2 text-xs italic" style="color: var(--color-text-muted);">
+              Typing...
+            </div>
+          }
+
           <!-- Input bar -->
           <div class="p-3 pb-[calc(0.75rem+3.5rem)] md:pb-3"
                style="background-color: var(--color-surface); border-top: 1px solid var(--color-border);">
             <div class="flex items-center gap-2">
-              <input [(ngModel)]="messageInput" (keyup.enter)="sendMessage()"
+              <input [(ngModel)]="messageInput" (input)="onTyping()" (keyup.enter)="sendMessage()"
                      placeholder="Message…"
                      class="flex-1 px-4 py-2.5 rounded-full text-sm transition-colors msg-input focus:outline-none"
                      style="background-color: var(--color-background); border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-body);">

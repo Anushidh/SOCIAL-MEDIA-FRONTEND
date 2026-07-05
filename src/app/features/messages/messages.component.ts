@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -18,7 +18,7 @@ import { TimeAgoPipe } from '../../shared/pipes/time-ago.pipe';
   imports: [CommonModule, FormsModule, AvatarComponent, TimeAgoPipe],
   templateUrl: './messages.component.html',
 })
-export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class MessagesComponent implements OnInit, OnDestroy {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
 
   conversations: Conversation[] = [];
@@ -86,22 +86,25 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
-  }
-
   private setupSocketListeners(): void {
     // New real-time message
     this.subscriptions.add(
       this.socketService.onChat<Message>('newMessage').subscribe((msg) => {
         if (msg.conversationId === this.activeConversation?.id) {
-          this.messages.push(msg);
-          this.socketService.markRead(this.activeConversation.id);
+          if (msg.senderId !== this.currentUserId) {
+            this.messages.push(msg);
+            setTimeout(() => this.scrollToBottom());
+            this.socketService.markRead(this.activeConversation.id);
+            this.messagesService.markAsRead(this.activeConversation.id).subscribe({
+              next: () => this.messagesService.getUnreadCount().subscribe()
+            });
+          }
         } else {
           // Update unread count on the conversation in the list
           const conv = this.conversations.find((c) => c.id === msg.conversationId);
           if (conv) conv.unreadCount = (conv.unreadCount ?? 0) + 1;
         }
+        this.updateConversationList(msg);
       }),
     );
 
@@ -119,14 +122,6 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (conversationId === this.activeConversation?.id) {
           this.typingUsers.delete(userId);
         }
-      }),
-    );
-
-    // Messages read by other party
-    this.subscriptions.add(
-      this.socketService.onChat('messagesRead').subscribe(({ conversationId }) => {
-        const conv = this.conversations.find((c) => c.id === conversationId);
-        if (conv) conv.unreadCount = 0;
       }),
     );
   }
@@ -165,6 +160,13 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
+  backToList(): void {
+    if (this.activeConversation) {
+      this.socketService.leaveConversation(this.activeConversation.id);
+    }
+    this.activeConversation = null;
+  }
+
   openConversation(conv: Conversation): void {
     if (this.activeConversation) {
       this.socketService.leaveConversation(this.activeConversation.id);
@@ -180,9 +182,18 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
       next: (res) => {
         this.messages = [...res.data].reverse();
         this.loadingMessages = false;
-        conv.unreadCount = 0;
-        this.messagesService.markAsRead(conv.id).subscribe();
-        this.socketService.markRead(conv.id);
+        setTimeout(() => this.scrollToBottom());
+        
+        if (conv.unreadCount > 0) {
+          conv.unreadCount = 0;
+          this.messagesService.markAsRead(conv.id).subscribe({
+            next: () => this.messagesService.getUnreadCount().subscribe()
+          });
+          this.socketService.markRead(conv.id);
+        } else {
+          this.messagesService.markAsRead(conv.id).subscribe();
+          this.socketService.markRead(conv.id);
+        }
       },
       error: () => (this.loadingMessages = false),
     });
@@ -194,16 +205,28 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
     const content = this.messageInput;
     this.messageInput = '';
 
-    this.messagesService.sendMessage(this.activeConversation.id, content).subscribe({
-      next: (msg) => {
-        this.messages.push(msg);
+    // Stop typing immediately
+    this.socketService.sendStopTyping(this.activeConversation.id);
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+      this.typingTimeout = null;
+    }
+
+    this.socketService.sendMessage(this.activeConversation.id, content).then((res) => {
+      if (res.success && res.message) {
+        this.messages.push(res.message);
         this.sending = false;
-      },
-      error: () => {
+        setTimeout(() => this.scrollToBottom());
+        this.updateConversationList(res.message);
+      } else {
         this.messageInput = content;
         this.sending = false;
         this.toast.error('Failed to send message');
-      },
+      }
+    }).catch(() => {
+      this.messageInput = content;
+      this.sending = false;
+      this.toast.error('Failed to send message');
     });
   }
 
@@ -226,6 +249,21 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   getOtherParticipant(conv: Conversation) {
     return conv.participants?.find((p) => p.id !== this.currentUserId);
+  }
+
+  private updateConversationList(msg: Message): void {
+    const convIndex = this.conversations.findIndex((c) => c.id === msg.conversationId);
+    if (convIndex > -1) {
+      const conv = this.conversations[convIndex];
+      conv.lastMessage = msg;
+      conv.updatedAt = msg.createdAt;
+      
+      // Move to top if not already at the top
+      if (convIndex !== 0) {
+        this.conversations.splice(convIndex, 1);
+        this.conversations.unshift(conv);
+      }
+    }
   }
 
   private scrollToBottom(): void {
